@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title></title>
+    <description>Guillaume's musings</description>
+    <link>http://kafecho.github.io/blog//</link>
+    <atom:link href="http://kafecho.github.io/blog//feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Mon, 21 Nov 2016 16:40:52 +0200</pubDate>
+    <lastBuildDate>Mon, 21 Nov 2016 16:40:52 +0200</lastBuildDate>
+    <generator>Jekyll v3.2.1</generator>
+    
+      <item>
+        <title>Running ad-hoc roles with Ansible</title>
+        <description>&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;A meta-playbook for running any roles&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_a-bit-of-context&quot;&gt;A bit of context&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ansible &lt;strong&gt;roles&lt;/strong&gt; (&lt;a href=&quot;http://docs.ansible.com/ansible/playbooks_roles.html#roles&quot; class=&quot;bare&quot;&gt;http://docs.ansible.com/ansible/playbooks_roles.html#roles&lt;/a&gt;) are a very nice construct that provide LEGO-style building blocks that are useful when deploying software.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For example, I&amp;#8217;ve designed quite a few roles to deploy a bunch of things, including:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Oracle JDKs&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Solr (which needs a JDK)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;SolrCloud (which needs Solr)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Zookeeper (which needs a JDK)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;HAProxy&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Keepalived (to create a failover cluster of things)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Those roles can be combined to create a load-balanced cluster of SolrCloud instances where the load-balancers themselves are resilient.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Like LEGO, you can combine the roles in different ways.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For example to install Logstash, I install an Oracle JDK role.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To install a fail-over cluster of CouchDB nodes, I deploy a CouchDB role combined with the Keepalived role, and so on and so forth.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Normally, to run a role you have to include it in a playbook, but sometimes &lt;strong&gt;all you really want&lt;/strong&gt; is to be able to deploy a role on a bunch of machines &lt;strong&gt;without having to craft a playbook&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_the-solution&quot;&gt;The solution&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Caveat: &lt;em&gt;someone&amp;#8217;s elegant solution could be considered a hack by somebody else&lt;/em&gt; :-)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So I created a generic playbook (let&amp;#8217;s call this deploy-role.yaml) that looks like this:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;yaml&quot;&gt;&lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;---&lt;/span&gt;
+- hosts: all
+  sudo: yes
+  roles:
+  - &lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;{{&lt;/span&gt;&lt;span style=&quot;color: #19177C&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;role&lt;/span&gt;&lt;span style=&quot;color: #19177C&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;}}&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Given an inventory file, you can then deploy any arbitrary role like so:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;ansible-playbook -i myInventory deploy-role.yaml -e &quot;role=tcpdump&quot; -l linux-monitored-hosts&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This line specifies which role to deploy:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;-e &quot;role=tcpdump&quot;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This line specifies (or &lt;strong&gt;limits&lt;/strong&gt;) what machines to apply the role to:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;-l linux-monitored-hosts&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Here is another example to setup a JDK8 on a bunch of machines:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;ansible-playbook -i inventory deploy-role.yaml -e &quot;role=oracle-jdk8&quot; -l linux-monitored-hosts&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;It feels a bit &lt;strong&gt;hacky&lt;/strong&gt;, but it works.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Thu, 17 Nov 2016 00:00:00 +0200</pubDate>
+        <link>http://kafecho.github.io/blog//ansible/devops/2016/11/17/ad-hoc-ansible-role.html</link>
+        <guid isPermaLink="true">http://kafecho.github.io/blog//ansible/devops/2016/11/17/ad-hoc-ansible-role.html</guid>
+        
+        
+        <category>Ansible</category>
+        
+        <category>DevOps</category>
+        
+      </item>
+    
+      <item>
+        <title>Learning Elm</title>
+        <description>&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Make JS great again?&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_a-bit-of-context&quot;&gt;A bit of context&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Disclaimer&lt;/strong&gt;: I quite like JavaScript and I think that some of the modern Web APIs (media source extension, web audio api) are really cool, especially when you work in the media domain.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I&amp;#8217;ve written some JavaScript applications (some are used in production in various places), but they all tend to be rather small.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Having worked on a non-trivial Angular.js stack, I have a &lt;strong&gt;gut feeling&lt;/strong&gt; that JavaScript does not scale very well with complexity.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This could very well be due to the fact that I am mostly a server-side engineer.
+Having used FP/ typed languages before, I had no issue (or stress) working on large codebases knowing the compiler will do its best to rescue my failing brain.
+I could not say the same about large JS codebases.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I think browsers are cool (they are the ultimate platform for running apps; the Web is ubiquitous after all).
+And some people are really gifted at writing front-end JS code, but I feel that this approach would not work for me.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So in my spare time, as a research experiment, I&amp;#8217;ve been looking at other options.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_enter-elm&quot;&gt;Enter Elm&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Elm (&lt;a href=&quot;http://elm-lang.org/&quot; class=&quot;bare&quot;&gt;http://elm-lang.org/&lt;/a&gt;) combines a bunch of ideas in one neatly put together package that you can use for building front-end web apps:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;it is a typed functional programming language ( a la Haskell ) that compiles down to JavaScript&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;things in Elm are immutable&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;it implements a virtual DOM which is very fast&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;errors should be detected at compile-time instead of throwing exceptions at runtime&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Elm has a very opinionated idea of what a web-app should be architected (this is called the Elm architecture &lt;a href=&quot;http://guide.elm-lang.org/architecture/&quot; class=&quot;bare&quot;&gt;http://guide.elm-lang.org/architecture/&lt;/a&gt; ) and it is roughly based on the following ideas:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;you have an immutable model&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;you render the model via a virtual DOM&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;user inputs or other external events will trigger changes to the model ( i.e. a new model is created from the old one) which will trigger updates to the virtual DOM.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;and repeat the loop&amp;#8230;&amp;#8203;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In some ways, this is very similar to how React + Redux work (well actually Redux was inspired by Elm).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As a starting point, I recommend reading &lt;a href=&quot;http://guide.elm-lang.org/&quot; class=&quot;bare&quot;&gt;http://guide.elm-lang.org/&lt;/a&gt; as it gives a good overview of what Elm can do.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_some-examples&quot;&gt;Some examples&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_hello-world&quot;&gt;Hello world&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Here is what a Hello world looks like in Elm:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;haskell&quot;&gt;&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;import&lt;/span&gt; &lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;Html&lt;/span&gt; exposing (&lt;span style=&quot;color: #666666&quot;&gt;..&lt;/span&gt;)
+
+&lt;span style=&quot;color: #0000FF&quot;&gt;main&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt;
+  text &lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;Hello, world&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In the simplest case, main is a &lt;strong&gt;function&lt;/strong&gt; that creates a virtual DOM (which Elm eventually renders on the screen).
+Instead of writing HTML using the usual tags, you use functions from the &lt;strong&gt;Html&lt;/strong&gt; module to create the virtual DOM.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Because you are combining functions, it is trivial to refactor how the DOM is constructed, for example:&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_refactor-the-dom&quot;&gt;Refactor the DOM&lt;/h3&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;haskell&quot;&gt;&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;import&lt;/span&gt; &lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;Html&lt;/span&gt; exposing (&lt;span style=&quot;color: #666666&quot;&gt;..&lt;/span&gt;)
+&lt;span style=&quot;color: #0000FF&quot;&gt;user&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;Guillaume&amp;quot;&lt;/span&gt;
+&lt;span style=&quot;color: #0000FF&quot;&gt;main&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt;
+  text ( &lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;Hello &amp;quot;&lt;/span&gt; &lt;span style=&quot;color: #666666&quot;&gt;++&lt;/span&gt; user )&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;What is nice about this code, is that it is actually compiled, so if you make a minor mistake the compiler will barf at you, for example:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;haskell&quot;&gt;&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;import&lt;/span&gt; &lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;Html&lt;/span&gt; exposing (&lt;span style=&quot;color: #666666&quot;&gt;..&lt;/span&gt;)
+&lt;span style=&quot;color: #0000FF&quot;&gt;usr&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;Guillaume&amp;quot;&lt;/span&gt;
+&lt;span style=&quot;color: #0000FF&quot;&gt;main&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt;
+  text ( &lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;Hello &amp;quot;&lt;/span&gt; &lt;span style=&quot;color: #666666&quot;&gt;++&lt;/span&gt; user )&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The compiler will warn you with a pretty good error message, showing you what the issue might be:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;text&quot;&gt;Detected errors in 1 module.
+
+-- NAMING ERROR ------------------------------------------------ hello-world.elm
+
+Cannot find variable `user`
+
+4|   text ( &amp;quot;Hello &amp;quot; ++ user )
+                        ^^^^
+Maybe you want one of the following?
+
+    usr&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_more-complex-constructs&quot;&gt;More complex constructs&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Even when building the virtual DOM, you have access to all the language constructs, so here is how you build a page where the same element appears many times.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;haskell&quot;&gt;&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;import&lt;/span&gt; &lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;Html&lt;/span&gt; exposing (&lt;span style=&quot;color: #666666&quot;&gt;..&lt;/span&gt;)
+&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;import&lt;/span&gt; &lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;List&lt;/span&gt;
+
+&lt;span style=&quot;color: #0000FF&quot;&gt;user&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;Guillaume&amp;quot;&lt;/span&gt;
+&lt;span style=&quot;color: #0000FF&quot;&gt;nbTimes&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #666666&quot;&gt;20&lt;/span&gt;
+&lt;span style=&quot;color: #0000FF&quot;&gt;main&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt;
+  div&lt;span style=&quot;color: #B00040&quot;&gt;[]&lt;/span&gt;(
+    &lt;span style=&quot;color: #B00040&quot;&gt;List&lt;/span&gt;&lt;span style=&quot;color: #666666&quot;&gt;.&lt;/span&gt;repeat nbTimes (div&lt;span style=&quot;color: #B00040&quot;&gt;[]&lt;/span&gt;[text ( &lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;Hello &amp;quot;&lt;/span&gt; &lt;span style=&quot;color: #666666&quot;&gt;++&lt;/span&gt; user )])
+  )&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You can try this at: &lt;a href=&quot;http://elm-lang.org/try&quot; class=&quot;bare&quot;&gt;http://elm-lang.org/try&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_angular-style-binding&quot;&gt;Angular style binding&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In order to build more complex app, we need to start making use of the Elm architecture, namely:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;define a model&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;define how this model can be updated&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;define how this model can be rendered&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So we can build a simple page with a text field to update the Hello message as the user types.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;It will look like the following:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;haskell&quot;&gt;&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;import&lt;/span&gt; &lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;Html&lt;/span&gt; exposing (&lt;span style=&quot;color: #666666&quot;&gt;..&lt;/span&gt;)
+&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;import&lt;/span&gt; &lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;Html.Attributes&lt;/span&gt; exposing (&lt;span style=&quot;color: #666666&quot;&gt;..&lt;/span&gt;)
+&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;import&lt;/span&gt; &lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;Html.Events&lt;/span&gt; exposing (onInput)
+&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;import&lt;/span&gt; &lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;Html.App&lt;/span&gt;
+
+&lt;span style=&quot;color: #408080; font-style: italic&quot;&gt;-- MODEL&lt;/span&gt;
+&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;type&lt;/span&gt; alias &lt;span style=&quot;color: #B00040&quot;&gt;Model&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;String&lt;/span&gt;
+&lt;span style=&quot;color: #0000FF&quot;&gt;model&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;:&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Model&lt;/span&gt;
+&lt;span style=&quot;color: #0000FF&quot;&gt;model&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;&amp;quot;&lt;/span&gt;
+
+&lt;span style=&quot;color: #408080; font-style: italic&quot;&gt;-- Type of messages&lt;/span&gt;
+&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;type&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Msg&lt;/span&gt;
+  &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Name&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;String&lt;/span&gt;
+
+&lt;span style=&quot;color: #408080; font-style: italic&quot;&gt;-- Update&lt;/span&gt;
+&lt;span style=&quot;color: #0000FF&quot;&gt;update&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;:&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Msg&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Model&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Model&lt;/span&gt;
+&lt;span style=&quot;color: #0000FF&quot;&gt;update&lt;/span&gt; msg model &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt;
+  &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;case&lt;/span&gt; msg &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;of&lt;/span&gt;
+    &lt;span style=&quot;color: #B00040&quot;&gt;Name&lt;/span&gt; n &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;-&amp;gt;&lt;/span&gt; n
+
+&lt;span style=&quot;color: #0000FF&quot;&gt;view&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;:&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Model&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Html&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Msg&lt;/span&gt;
+&lt;span style=&quot;color: #0000FF&quot;&gt;view&lt;/span&gt; model &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt;
+  div&lt;span style=&quot;color: #B00040&quot;&gt;[]&lt;/span&gt;[
+    input [ placeholder &lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;Your name&amp;quot;&lt;/span&gt;, onInput &lt;span style=&quot;color: #B00040&quot;&gt;Name&lt;/span&gt; ]&lt;span style=&quot;color: #B00040&quot;&gt;[]&lt;/span&gt;,
+    div&lt;span style=&quot;color: #B00040&quot;&gt;[]&lt;/span&gt;[
+      text (&lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;Hello &amp;quot;&lt;/span&gt; &lt;span style=&quot;color: #666666&quot;&gt;++&lt;/span&gt; model )
+    ]
+  ]
+
+&lt;span style=&quot;color: #0000FF&quot;&gt;main&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt;
+    &lt;span style=&quot;color: #B00040&quot;&gt;Html&lt;/span&gt;&lt;span style=&quot;color: #666666&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color: #B00040&quot;&gt;App&lt;/span&gt;&lt;span style=&quot;color: #666666&quot;&gt;.&lt;/span&gt;beginnerProgram {
+    model &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; model,
+    view &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; view,
+    update &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; update }&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So in plain english, &lt;em&gt;we define an explicit model, and update and a view. When the user updates the view, it generates a message to update the model, which then updates the view.&lt;/em&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Coming from JavaScript, the signature of the functions might look a bit weird, but basically Elm functions only have 1 parameter so:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;update : Msg -&amp;gt; Model -&amp;gt; Model&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Is a function which takes a Msg then returns a function which takes Model than returns a function which returns a Model. Pfffff
+This sounds a bit like &lt;strong&gt;Inception&lt;/strong&gt; but it is actually called &lt;strong&gt;function currying&lt;/strong&gt;. More information at &lt;a href=&quot;https://www.reddit.com/r/elm/comments/3jtj7s/how_do_i_read_these_function_typings/&quot; class=&quot;bare&quot;&gt;https://www.reddit.com/r/elm/comments/3jtj7s/how_do_i_read_these_function_typings/&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;But in plain english: &lt;em&gt;the update function takes a Msg &lt;strong&gt;AND&lt;/strong&gt; a Model &lt;strong&gt;AND then&lt;/strong&gt; returns a &lt;strong&gt;new&lt;/strong&gt; model.&lt;/em&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_angular-style-binding-part-deux&quot;&gt;Angular style binding (part deux)&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To make this more exciting we can add a second input field where the user can enter how many times the welcome message should be repeated.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To do that, we have to refactor our Model a bit, and also our update function.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Our model has to become a &lt;strong&gt;record&lt;/strong&gt; (think &lt;strong&gt;typed JSON&lt;/strong&gt;) so it can hold multiple fields, like so:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;haskell&quot;&gt;&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;type&lt;/span&gt; alias &lt;span style=&quot;color: #B00040&quot;&gt;Model&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt;  { name&lt;span style=&quot;color: #B00040&quot;&gt;:&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;String&lt;/span&gt;, nbTimes&lt;span style=&quot;color: #B00040&quot;&gt;:&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Int&lt;/span&gt; }
+&lt;span style=&quot;color: #0000FF&quot;&gt;model&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;:&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Model&lt;/span&gt;
+&lt;span style=&quot;color: #0000FF&quot;&gt;model&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; { name &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;&amp;quot;&lt;/span&gt;, nbTimes &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #666666&quot;&gt;0&lt;/span&gt;}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now we need new messages to update the name or the number of times it should appear, like so:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;haskell&quot;&gt;&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;type&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Msg&lt;/span&gt;
+  &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Name&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;String&lt;/span&gt;
+  &lt;span style=&quot;color: #666666&quot;&gt;|&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;NbTimes&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;String&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The update function becomes more complicated because we have to handle more messages:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;haskell&quot;&gt;&lt;span style=&quot;color: #0000FF&quot;&gt;update&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;:&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Msg&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Model&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Model&lt;/span&gt;
+&lt;span style=&quot;color: #0000FF&quot;&gt;update&lt;/span&gt; msg model &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt;
+  &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;case&lt;/span&gt; msg &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;of&lt;/span&gt;
+    &lt;span style=&quot;color: #B00040&quot;&gt;Name&lt;/span&gt; newName &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;-&amp;gt;&lt;/span&gt;
+      { model &lt;span style=&quot;color: #666666&quot;&gt;|&lt;/span&gt; name &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; newName }
+    &lt;span style=&quot;color: #B00040&quot;&gt;NbTimes&lt;/span&gt; s &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;-&amp;gt;&lt;/span&gt;
+      { model &lt;span style=&quot;color: #666666&quot;&gt;|&lt;/span&gt; nbTimes &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Result&lt;/span&gt;&lt;span style=&quot;color: #666666&quot;&gt;.&lt;/span&gt;withDefault &lt;span style=&quot;color: #666666&quot;&gt;0&lt;/span&gt; (&lt;span style=&quot;color: #B00040&quot;&gt;String&lt;/span&gt;&lt;span style=&quot;color: #666666&quot;&gt;.&lt;/span&gt;toInt s) }&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In case this is not obvious, the model is not updated in place.
+We create a new version of the model with the updated fields.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;And finally, we modify our view to dynamically create entries based on the text and the number of repetitions, like so:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;haskell&quot;&gt;&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;import&lt;/span&gt; &lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;Html&lt;/span&gt; exposing (&lt;span style=&quot;color: #666666&quot;&gt;..&lt;/span&gt;)
+&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;import&lt;/span&gt; &lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;Html.Attributes&lt;/span&gt; exposing (&lt;span style=&quot;color: #666666&quot;&gt;..&lt;/span&gt;)
+&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;import&lt;/span&gt; &lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;Html.Events&lt;/span&gt; exposing (onInput)
+&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;import&lt;/span&gt; &lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;Html.App&lt;/span&gt;
+&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;import&lt;/span&gt; &lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;String&lt;/span&gt;
+
+&lt;span style=&quot;color: #408080; font-style: italic&quot;&gt;-- MODEL&lt;/span&gt;
+&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;type&lt;/span&gt; alias &lt;span style=&quot;color: #B00040&quot;&gt;Model&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt;  { name&lt;span style=&quot;color: #B00040&quot;&gt;:&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;String&lt;/span&gt;, nbTimes&lt;span style=&quot;color: #B00040&quot;&gt;:&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Int&lt;/span&gt; }
+&lt;span style=&quot;color: #0000FF&quot;&gt;model&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;:&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Model&lt;/span&gt;
+&lt;span style=&quot;color: #0000FF&quot;&gt;model&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; { name &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;&amp;quot;&lt;/span&gt;, nbTimes &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #666666&quot;&gt;0&lt;/span&gt;}
+
+&lt;span style=&quot;color: #408080; font-style: italic&quot;&gt;-- Type of messages&lt;/span&gt;
+&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;type&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Msg&lt;/span&gt;
+  &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Name&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;String&lt;/span&gt;
+  &lt;span style=&quot;color: #666666&quot;&gt;|&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;NbTimes&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;String&lt;/span&gt;
+
+&lt;span style=&quot;color: #408080; font-style: italic&quot;&gt;-- Update&lt;/span&gt;
+&lt;span style=&quot;color: #0000FF&quot;&gt;update&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;:&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Msg&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Model&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Model&lt;/span&gt;
+&lt;span style=&quot;color: #0000FF&quot;&gt;update&lt;/span&gt; msg model &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt;
+  &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;case&lt;/span&gt; msg &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;of&lt;/span&gt;
+    &lt;span style=&quot;color: #B00040&quot;&gt;Name&lt;/span&gt; newName &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;-&amp;gt;&lt;/span&gt;
+      { model &lt;span style=&quot;color: #666666&quot;&gt;|&lt;/span&gt; name &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; newName }
+    &lt;span style=&quot;color: #B00040&quot;&gt;NbTimes&lt;/span&gt; s &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;-&amp;gt;&lt;/span&gt;
+      { model &lt;span style=&quot;color: #666666&quot;&gt;|&lt;/span&gt; nbTimes &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Result&lt;/span&gt;&lt;span style=&quot;color: #666666&quot;&gt;.&lt;/span&gt;withDefault &lt;span style=&quot;color: #666666&quot;&gt;0&lt;/span&gt; (&lt;span style=&quot;color: #B00040&quot;&gt;String&lt;/span&gt;&lt;span style=&quot;color: #666666&quot;&gt;.&lt;/span&gt;toInt s) }
+
+&lt;span style=&quot;color: #0000FF&quot;&gt;view&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;:&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Model&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Html&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;Msg&lt;/span&gt;
+&lt;span style=&quot;color: #0000FF&quot;&gt;view&lt;/span&gt; model &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt;
+  div&lt;span style=&quot;color: #B00040&quot;&gt;[]&lt;/span&gt;[
+    input [ placeholder &lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;Your name&amp;quot;&lt;/span&gt;, onInput &lt;span style=&quot;color: #B00040&quot;&gt;Name&lt;/span&gt; ]&lt;span style=&quot;color: #B00040&quot;&gt;[]&lt;/span&gt;
+    ,input [ placeholder &lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;How many?&amp;quot;&lt;/span&gt;, onInput &lt;span style=&quot;color: #B00040&quot;&gt;NbTimes&lt;/span&gt; ]&lt;span style=&quot;color: #B00040&quot;&gt;[]&lt;/span&gt;
+    ,div&lt;span style=&quot;color: #B00040&quot;&gt;[]&lt;/span&gt;(
+      &lt;span style=&quot;color: #B00040&quot;&gt;List&lt;/span&gt;&lt;span style=&quot;color: #666666&quot;&gt;.&lt;/span&gt;repeat (model&lt;span style=&quot;color: #666666&quot;&gt;.&lt;/span&gt;nbTimes) (div&lt;span style=&quot;color: #B00040&quot;&gt;[]&lt;/span&gt;[text (&lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;Hello &amp;quot;&lt;/span&gt; &lt;span style=&quot;color: #666666&quot;&gt;++&lt;/span&gt; model&lt;span style=&quot;color: #666666&quot;&gt;.&lt;/span&gt;name )])
+    )
+  ]
+
+&lt;span style=&quot;color: #0000FF&quot;&gt;main&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt;
+    &lt;span style=&quot;color: #B00040&quot;&gt;Html&lt;/span&gt;&lt;span style=&quot;color: #666666&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color: #B00040&quot;&gt;App&lt;/span&gt;&lt;span style=&quot;color: #666666&quot;&gt;.&lt;/span&gt;beginnerProgram {
+    model &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; model,
+    view &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; view,
+    update &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt; update }&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;All this code is type-checked and compiled so no nasty surprises at runtime.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_parting-words&quot;&gt;Parting words&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I&amp;#8217;ve only scratched the surface with Elm, I have plenty more to learn, but so far it feels like a nice little language (and I like its friendly community).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I do like the fact that the update loop is explicit (no binding magic) and that everything is compiled (I made about 4 errors while writing this simple example above), but after that, no runtime surprises.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Elm might take a while to get used to if you come from an imperative programming background.
+It aims at being as pure as possible so the way you handle side effects (like keypresses, field inputs or even dates) might seem odd coming from vanilla JS.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;But so far I like it, but that is just me, so &lt;strong&gt;YMMV&lt;/strong&gt; like they say.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Tue, 08 Nov 2016 00:00:00 +0200</pubDate>
+        <link>http://kafecho.github.io/blog//elm/javascript/functionalprogramming/2016/11/08/learning-elm.html</link>
+        <guid isPermaLink="true">http://kafecho.github.io/blog//elm/javascript/functionalprogramming/2016/11/08/learning-elm.html</guid>
+        
+        
+        <category>Elm</category>
+        
+        <category>JavaScript</category>
+        
+        <category>FunctionalProgramming</category>
+        
+      </item>
+    
+      <item>
+        <title>Hello, World! It&amp;#8217;s been a while :-)</title>
+        <description>&lt;div id=&quot;preamble&quot;&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;After a rather long hiatus, I&amp;#8217;ve decided to resume blogging.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This time around, since we are in 2016, well &lt;strong&gt;almost 2017&lt;/strong&gt;, I am trying &lt;strong&gt;new&lt;/strong&gt; tech: a static blog generated with Jekyll (&lt;a href=&quot;https://jekyllrb.com/&quot; class=&quot;bare&quot;&gt;https://jekyllrb.com/&lt;/a&gt;) and hosted on Github pages (&lt;a href=&quot;https://pages.github.com/&quot; class=&quot;bare&quot;&gt;https://pages.github.com/&lt;/a&gt;).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;It&amp;#8217;s not really that new, but I am just playing catch-up with the cool kids.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_why-jekyll&quot;&gt;Why Jekyll?&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Since I &lt;strong&gt;mostly&lt;/strong&gt; blog about technical work, I&amp;#8217;ve decided to go with Jekyll as it supports Asciidoc (&lt;a href=&quot;http://www.methods.co.nz/asciidoc/&quot; class=&quot;bare&quot;&gt;http://www.methods.co.nz/asciidoc/&lt;/a&gt;) fairly well.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I also happen to write a lot of work documentation with asciidoctor (&lt;a href=&quot;http://asciidoctor.org/&quot; class=&quot;bare&quot;&gt;http://asciidoctor.org/&lt;/a&gt;) so I can write plenty of things like:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;scala&quot;&gt;&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;def&lt;/span&gt; helloFromScala&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;:&lt;/span&gt; &lt;span style=&quot;color: #B00040&quot;&gt;String&lt;/span&gt; &lt;span style=&quot;color: #666666&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;Hello World&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;or&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;haskell&quot;&gt;&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;import&lt;/span&gt; &lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;Html&lt;/span&gt; exposing (&lt;span style=&quot;color: #666666&quot;&gt;..&lt;/span&gt;)
+&lt;span style=&quot;color: #0000FF&quot;&gt;main&lt;/span&gt; &lt;span style=&quot;color: #AA22FF; font-weight: bold&quot;&gt;=&lt;/span&gt;
+  text &lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;Hello&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;or&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;literalblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;git clone http://deathstar.git&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&amp;#8230;&amp;#8203;and it &lt;strong&gt;should&lt;/strong&gt; all render beautifully :-)&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_not-just-work&quot;&gt;Not just work&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;But life is not all about work, so hopefully I will write about travelling through South Africa, my attempts at (re) learning the piano, (re) playing the drum kit, learning photography.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;And we might even talk about some cool Caribbean recipes (who&amp;#8217;s heard of sauce chien before: &lt;a href=&quot;http://andrewzimmern.com/2015/05/18/sauce-chien/&quot; class=&quot;bare&quot;&gt;http://andrewzimmern.com/2015/05/18/sauce-chien/&lt;/a&gt; ? )&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So stay tune for more.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Tue, 08 Nov 2016 00:00:00 +0200</pubDate>
+        <link>http://kafecho.github.io/blog//hello/2016/11/08/hello-world.html</link>
+        <guid isPermaLink="true">http://kafecho.github.io/blog//hello/2016/11/08/hello-world.html</guid>
+        
+        
+        <category>Hello</category>
+        
+      </item>
+    
+  </channel>
+</rss>

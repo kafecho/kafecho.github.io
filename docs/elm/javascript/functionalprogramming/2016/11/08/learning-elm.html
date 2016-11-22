@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+    <title>Head In The Clouds - Guillaume's musings</title>
+    <meta name="description" content="" />
+
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="MobileOptimized" content="320" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <!-- Customisation  -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/main.css" />
+
+</head>
+<body class="home-template">
+
+    <header class="main-header post-head no-cover">
+    <nav class="main-nav  clearfix">
+        <a class="back-button icon-arrow-left" href="/">Home</a>
+        <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+    </nav>
+</header>
+
+<main class="content" role="main">
+
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">Learning Elm</h1>
+            <section class="post-meta">
+                <time class="post-date" datetime="2016-11-08">08 Nov 2016</time>
+                
+                    on Elm, JavaScript, and FunctionalProgramming
+                
+            </section>
+        </header>
+
+<!--         <header class="post-header">
+            <a id="blog-logo" href="http://kafecho.github.io/blog">
+                
+                    <span class="blog-title">Head In The Clouds</span>
+                
+            </a>
+        </header> -->
+
+        <!-- <span class="post-meta">
+            <time datetime="2016-11-08">08 Nov 2016</time>
+            
+                on Elm, JavaScript, and FunctionalProgramming
+            
+        </span> -->
+
+        <!-- <h1 class="post-title">Learning Elm</h1> -->
+
+        <section class="post-content">
+            <div class="paragraph">
+<p>Make JS great again?</p>
+</div>
+<div class="sect1">
+<h2 id="_a-bit-of-context">A bit of context</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><strong>Disclaimer</strong>: I quite like JavaScript and I think that some of the modern Web APIs (media source extension, web audio api) are really cool, especially when you work in the media domain.</p>
+</div>
+<div class="paragraph">
+<p>I&#8217;ve written some JavaScript applications (some are used in production in various places), but they all tend to be rather small.</p>
+</div>
+<div class="paragraph">
+<p>Having worked on a non-trivial Angular.js stack, I have a <strong>gut feeling</strong> that JavaScript does not scale very well with complexity.</p>
+</div>
+<div class="paragraph">
+<p>This could very well be due to the fact that I am mostly a server-side engineer.
+Having used FP/ typed languages before, I had no issue (or stress) working on large codebases knowing the compiler will do its best to rescue my failing brain.
+I could not say the same about large JS codebases.</p>
+</div>
+<div class="paragraph">
+<p>I think browsers are cool (they are the ultimate platform for running apps; the Web is ubiquitous after all).
+And some people are really gifted at writing front-end JS code, but I feel that this approach would not work for me.</p>
+</div>
+<div class="paragraph">
+<p>So in my spare time, as a research experiment, I&#8217;ve been looking at other options.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_enter-elm">Enter Elm</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Elm (<a href="http://elm-lang.org/" class="bare">http://elm-lang.org/</a>) combines a bunch of ideas in one neatly put together package that you can use for building front-end web apps:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>it is a typed functional programming language ( a la Haskell ) that compiles down to JavaScript</p>
+</li>
+<li>
+<p>things in Elm are immutable</p>
+</li>
+<li>
+<p>it implements a virtual DOM which is very fast</p>
+</li>
+<li>
+<p>errors should be detected at compile-time instead of throwing exceptions at runtime</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Elm has a very opinionated idea of what a web-app should be architected (this is called the Elm architecture <a href="http://guide.elm-lang.org/architecture/" class="bare">http://guide.elm-lang.org/architecture/</a> ) and it is roughly based on the following ideas:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>you have an immutable model</p>
+</li>
+<li>
+<p>you render the model via a virtual DOM</p>
+</li>
+<li>
+<p>user inputs or other external events will trigger changes to the model ( i.e. a new model is created from the old one) which will trigger updates to the virtual DOM.</p>
+</li>
+<li>
+<p>and repeat the loop&#8230;&#8203;.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In some ways, this is very similar to how React + Redux work (well actually Redux was inspired by Elm).</p>
+</div>
+<div class="paragraph">
+<p>As a starting point, I recommend reading <a href="http://guide.elm-lang.org/" class="bare">http://guide.elm-lang.org/</a> as it gives a good overview of what Elm can do.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_some-examples">Some examples</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_hello-world">Hello world</h3>
+<div class="paragraph">
+<p>Here is what a Hello world looks like in Elm:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="haskell"><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">Html</span> exposing (<span style="color: #666666">..</span>)
+
+<span style="color: #0000FF">main</span> <span style="color: #AA22FF; font-weight: bold">=</span>
+  text <span style="color: #BA2121">&quot;Hello, world&quot;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the simplest case, main is a <strong>function</strong> that creates a virtual DOM (which Elm eventually renders on the screen).
+Instead of writing HTML using the usual tags, you use functions from the <strong>Html</strong> module to create the virtual DOM.</p>
+</div>
+<div class="paragraph">
+<p>Because you are combining functions, it is trivial to refactor how the DOM is constructed, for example:</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_refactor-the-dom">Refactor the DOM</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="haskell"><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">Html</span> exposing (<span style="color: #666666">..</span>)
+<span style="color: #0000FF">user</span> <span style="color: #AA22FF; font-weight: bold">=</span> <span style="color: #BA2121">&quot;Guillaume&quot;</span>
+<span style="color: #0000FF">main</span> <span style="color: #AA22FF; font-weight: bold">=</span>
+  text ( <span style="color: #BA2121">&quot;Hello &quot;</span> <span style="color: #666666">++</span> user )</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>What is nice about this code, is that it is actually compiled, so if you make a minor mistake the compiler will barf at you, for example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="haskell"><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">Html</span> exposing (<span style="color: #666666">..</span>)
+<span style="color: #0000FF">usr</span> <span style="color: #AA22FF; font-weight: bold">=</span> <span style="color: #BA2121">&quot;Guillaume&quot;</span>
+<span style="color: #0000FF">main</span> <span style="color: #AA22FF; font-weight: bold">=</span>
+  text ( <span style="color: #BA2121">&quot;Hello &quot;</span> <span style="color: #666666">++</span> user )</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The compiler will warn you with a pretty good error message, showing you what the issue might be:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="text">Detected errors in 1 module.
+
+-- NAMING ERROR ------------------------------------------------ hello-world.elm
+
+Cannot find variable `user`
+
+4|   text ( &quot;Hello &quot; ++ user )
+                        ^^^^
+Maybe you want one of the following?
+
+    usr</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_more-complex-constructs">More complex constructs</h3>
+<div class="paragraph">
+<p>Even when building the virtual DOM, you have access to all the language constructs, so here is how you build a page where the same element appears many times.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="haskell"><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">Html</span> exposing (<span style="color: #666666">..</span>)
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">List</span>
+
+<span style="color: #0000FF">user</span> <span style="color: #AA22FF; font-weight: bold">=</span> <span style="color: #BA2121">&quot;Guillaume&quot;</span>
+<span style="color: #0000FF">nbTimes</span> <span style="color: #AA22FF; font-weight: bold">=</span> <span style="color: #666666">20</span>
+<span style="color: #0000FF">main</span> <span style="color: #AA22FF; font-weight: bold">=</span>
+  div<span style="color: #B00040">[]</span>(
+    <span style="color: #B00040">List</span><span style="color: #666666">.</span>repeat nbTimes (div<span style="color: #B00040">[]</span>[text ( <span style="color: #BA2121">&quot;Hello &quot;</span> <span style="color: #666666">++</span> user )])
+  )</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>You can try this at: <a href="http://elm-lang.org/try" class="bare">http://elm-lang.org/try</a></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_angular-style-binding">Angular style binding</h3>
+<div class="paragraph">
+<p>In order to build more complex app, we need to start making use of the Elm architecture, namely:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>define a model</p>
+</li>
+<li>
+<p>define how this model can be updated</p>
+</li>
+<li>
+<p>define how this model can be rendered</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>So we can build a simple page with a text field to update the Hello message as the user types.</p>
+</div>
+<div class="paragraph">
+<p>It will look like the following:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="haskell"><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">Html</span> exposing (<span style="color: #666666">..</span>)
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">Html.Attributes</span> exposing (<span style="color: #666666">..</span>)
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">Html.Events</span> exposing (onInput)
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">Html.App</span>
+
+<span style="color: #408080; font-style: italic">-- MODEL</span>
+<span style="color: #008000; font-weight: bold">type</span> alias <span style="color: #B00040">Model</span> <span style="color: #AA22FF; font-weight: bold">=</span> <span style="color: #B00040">String</span>
+<span style="color: #0000FF">model</span> <span style="color: #B00040">:</span> <span style="color: #B00040">Model</span>
+<span style="color: #0000FF">model</span> <span style="color: #AA22FF; font-weight: bold">=</span> <span style="color: #BA2121">&quot;&quot;</span>
+
+<span style="color: #408080; font-style: italic">-- Type of messages</span>
+<span style="color: #008000; font-weight: bold">type</span> <span style="color: #B00040">Msg</span>
+  <span style="color: #AA22FF; font-weight: bold">=</span> <span style="color: #B00040">Name</span> <span style="color: #B00040">String</span>
+
+<span style="color: #408080; font-style: italic">-- Update</span>
+<span style="color: #0000FF">update</span> <span style="color: #B00040">:</span> <span style="color: #B00040">Msg</span> <span style="color: #AA22FF; font-weight: bold">-&gt;</span> <span style="color: #B00040">Model</span> <span style="color: #AA22FF; font-weight: bold">-&gt;</span> <span style="color: #B00040">Model</span>
+<span style="color: #0000FF">update</span> msg model <span style="color: #AA22FF; font-weight: bold">=</span>
+  <span style="color: #008000; font-weight: bold">case</span> msg <span style="color: #008000; font-weight: bold">of</span>
+    <span style="color: #B00040">Name</span> n <span style="color: #AA22FF; font-weight: bold">-&gt;</span> n
+
+<span style="color: #0000FF">view</span> <span style="color: #B00040">:</span> <span style="color: #B00040">Model</span> <span style="color: #AA22FF; font-weight: bold">-&gt;</span> <span style="color: #B00040">Html</span> <span style="color: #B00040">Msg</span>
+<span style="color: #0000FF">view</span> model <span style="color: #AA22FF; font-weight: bold">=</span>
+  div<span style="color: #B00040">[]</span>[
+    input [ placeholder <span style="color: #BA2121">&quot;Your name&quot;</span>, onInput <span style="color: #B00040">Name</span> ]<span style="color: #B00040">[]</span>,
+    div<span style="color: #B00040">[]</span>[
+      text (<span style="color: #BA2121">&quot;Hello &quot;</span> <span style="color: #666666">++</span> model )
+    ]
+  ]
+
+<span style="color: #0000FF">main</span> <span style="color: #AA22FF; font-weight: bold">=</span>
+    <span style="color: #B00040">Html</span><span style="color: #666666">.</span><span style="color: #B00040">App</span><span style="color: #666666">.</span>beginnerProgram {
+    model <span style="color: #AA22FF; font-weight: bold">=</span> model,
+    view <span style="color: #AA22FF; font-weight: bold">=</span> view,
+    update <span style="color: #AA22FF; font-weight: bold">=</span> update }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So in plain english, <em>we define an explicit model, and update and a view. When the user updates the view, it generates a message to update the model, which then updates the view.</em></p>
+</div>
+<div class="paragraph">
+<p>Coming from JavaScript, the signature of the functions might look a bit weird, but basically Elm functions only have 1 parameter so:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>update : Msg -&gt; Model -&gt; Model</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Is a function which takes a Msg then returns a function which takes Model than returns a function which returns a Model. Pfffff
+This sounds a bit like <strong>Inception</strong> but it is actually called <strong>function currying</strong>. More information at <a href="https://www.reddit.com/r/elm/comments/3jtj7s/how_do_i_read_these_function_typings/" class="bare">https://www.reddit.com/r/elm/comments/3jtj7s/how_do_i_read_these_function_typings/</a></p>
+</div>
+<div class="paragraph">
+<p>But in plain english: <em>the update function takes a Msg <strong>AND</strong> a Model <strong>AND then</strong> returns a <strong>new</strong> model.</em></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_angular-style-binding-part-deux">Angular style binding (part deux)</h3>
+<div class="paragraph">
+<p>To make this more exciting we can add a second input field where the user can enter how many times the welcome message should be repeated.</p>
+</div>
+<div class="paragraph">
+<p>To do that, we have to refactor our Model a bit, and also our update function.</p>
+</div>
+<div class="paragraph">
+<p>Our model has to become a <strong>record</strong> (think <strong>typed JSON</strong>) so it can hold multiple fields, like so:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="haskell"><span style="color: #008000; font-weight: bold">type</span> alias <span style="color: #B00040">Model</span> <span style="color: #AA22FF; font-weight: bold">=</span>  { name<span style="color: #B00040">:</span> <span style="color: #B00040">String</span>, nbTimes<span style="color: #B00040">:</span> <span style="color: #B00040">Int</span> }
+<span style="color: #0000FF">model</span> <span style="color: #B00040">:</span> <span style="color: #B00040">Model</span>
+<span style="color: #0000FF">model</span> <span style="color: #AA22FF; font-weight: bold">=</span> { name <span style="color: #AA22FF; font-weight: bold">=</span> <span style="color: #BA2121">&quot;&quot;</span>, nbTimes <span style="color: #AA22FF; font-weight: bold">=</span> <span style="color: #666666">0</span>}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now we need new messages to update the name or the number of times it should appear, like so:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="haskell"><span style="color: #008000; font-weight: bold">type</span> <span style="color: #B00040">Msg</span>
+  <span style="color: #AA22FF; font-weight: bold">=</span> <span style="color: #B00040">Name</span> <span style="color: #B00040">String</span>
+  <span style="color: #666666">|</span> <span style="color: #B00040">NbTimes</span> <span style="color: #B00040">String</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The update function becomes more complicated because we have to handle more messages:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="haskell"><span style="color: #0000FF">update</span> <span style="color: #B00040">:</span> <span style="color: #B00040">Msg</span> <span style="color: #AA22FF; font-weight: bold">-&gt;</span> <span style="color: #B00040">Model</span> <span style="color: #AA22FF; font-weight: bold">-&gt;</span> <span style="color: #B00040">Model</span>
+<span style="color: #0000FF">update</span> msg model <span style="color: #AA22FF; font-weight: bold">=</span>
+  <span style="color: #008000; font-weight: bold">case</span> msg <span style="color: #008000; font-weight: bold">of</span>
+    <span style="color: #B00040">Name</span> newName <span style="color: #AA22FF; font-weight: bold">-&gt;</span>
+      { model <span style="color: #666666">|</span> name <span style="color: #AA22FF; font-weight: bold">=</span> newName }
+    <span style="color: #B00040">NbTimes</span> s <span style="color: #AA22FF; font-weight: bold">-&gt;</span>
+      { model <span style="color: #666666">|</span> nbTimes <span style="color: #AA22FF; font-weight: bold">=</span> <span style="color: #B00040">Result</span><span style="color: #666666">.</span>withDefault <span style="color: #666666">0</span> (<span style="color: #B00040">String</span><span style="color: #666666">.</span>toInt s) }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In case this is not obvious, the model is not updated in place.
+We create a new version of the model with the updated fields.</p>
+</div>
+<div class="paragraph">
+<p>And finally, we modify our view to dynamically create entries based on the text and the number of repetitions, like so:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="haskell"><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">Html</span> exposing (<span style="color: #666666">..</span>)
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">Html.Attributes</span> exposing (<span style="color: #666666">..</span>)
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">Html.Events</span> exposing (onInput)
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">Html.App</span>
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">String</span>
+
+<span style="color: #408080; font-style: italic">-- MODEL</span>
+<span style="color: #008000; font-weight: bold">type</span> alias <span style="color: #B00040">Model</span> <span style="color: #AA22FF; font-weight: bold">=</span>  { name<span style="color: #B00040">:</span> <span style="color: #B00040">String</span>, nbTimes<span style="color: #B00040">:</span> <span style="color: #B00040">Int</span> }
+<span style="color: #0000FF">model</span> <span style="color: #B00040">:</span> <span style="color: #B00040">Model</span>
+<span style="color: #0000FF">model</span> <span style="color: #AA22FF; font-weight: bold">=</span> { name <span style="color: #AA22FF; font-weight: bold">=</span> <span style="color: #BA2121">&quot;&quot;</span>, nbTimes <span style="color: #AA22FF; font-weight: bold">=</span> <span style="color: #666666">0</span>}
+
+<span style="color: #408080; font-style: italic">-- Type of messages</span>
+<span style="color: #008000; font-weight: bold">type</span> <span style="color: #B00040">Msg</span>
+  <span style="color: #AA22FF; font-weight: bold">=</span> <span style="color: #B00040">Name</span> <span style="color: #B00040">String</span>
+  <span style="color: #666666">|</span> <span style="color: #B00040">NbTimes</span> <span style="color: #B00040">String</span>
+
+<span style="color: #408080; font-style: italic">-- Update</span>
+<span style="color: #0000FF">update</span> <span style="color: #B00040">:</span> <span style="color: #B00040">Msg</span> <span style="color: #AA22FF; font-weight: bold">-&gt;</span> <span style="color: #B00040">Model</span> <span style="color: #AA22FF; font-weight: bold">-&gt;</span> <span style="color: #B00040">Model</span>
+<span style="color: #0000FF">update</span> msg model <span style="color: #AA22FF; font-weight: bold">=</span>
+  <span style="color: #008000; font-weight: bold">case</span> msg <span style="color: #008000; font-weight: bold">of</span>
+    <span style="color: #B00040">Name</span> newName <span style="color: #AA22FF; font-weight: bold">-&gt;</span>
+      { model <span style="color: #666666">|</span> name <span style="color: #AA22FF; font-weight: bold">=</span> newName }
+    <span style="color: #B00040">NbTimes</span> s <span style="color: #AA22FF; font-weight: bold">-&gt;</span>
+      { model <span style="color: #666666">|</span> nbTimes <span style="color: #AA22FF; font-weight: bold">=</span> <span style="color: #B00040">Result</span><span style="color: #666666">.</span>withDefault <span style="color: #666666">0</span> (<span style="color: #B00040">String</span><span style="color: #666666">.</span>toInt s) }
+
+<span style="color: #0000FF">view</span> <span style="color: #B00040">:</span> <span style="color: #B00040">Model</span> <span style="color: #AA22FF; font-weight: bold">-&gt;</span> <span style="color: #B00040">Html</span> <span style="color: #B00040">Msg</span>
+<span style="color: #0000FF">view</span> model <span style="color: #AA22FF; font-weight: bold">=</span>
+  div<span style="color: #B00040">[]</span>[
+    input [ placeholder <span style="color: #BA2121">&quot;Your name&quot;</span>, onInput <span style="color: #B00040">Name</span> ]<span style="color: #B00040">[]</span>
+    ,input [ placeholder <span style="color: #BA2121">&quot;How many?&quot;</span>, onInput <span style="color: #B00040">NbTimes</span> ]<span style="color: #B00040">[]</span>
+    ,div<span style="color: #B00040">[]</span>(
+      <span style="color: #B00040">List</span><span style="color: #666666">.</span>repeat (model<span style="color: #666666">.</span>nbTimes) (div<span style="color: #B00040">[]</span>[text (<span style="color: #BA2121">&quot;Hello &quot;</span> <span style="color: #666666">++</span> model<span style="color: #666666">.</span>name )])
+    )
+  ]
+
+<span style="color: #0000FF">main</span> <span style="color: #AA22FF; font-weight: bold">=</span>
+    <span style="color: #B00040">Html</span><span style="color: #666666">.</span><span style="color: #B00040">App</span><span style="color: #666666">.</span>beginnerProgram {
+    model <span style="color: #AA22FF; font-weight: bold">=</span> model,
+    view <span style="color: #AA22FF; font-weight: bold">=</span> view,
+    update <span style="color: #AA22FF; font-weight: bold">=</span> update }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>All this code is type-checked and compiled so no nasty surprises at runtime.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_parting-words">Parting words</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>I&#8217;ve only scratched the surface with Elm, I have plenty more to learn, but so far it feels like a nice little language (and I like its friendly community).</p>
+</div>
+<div class="paragraph">
+<p>I do like the fact that the update loop is explicit (no binding magic) and that everything is compiled (I made about 4 errors while writing this simple example above), but after that, no runtime surprises.</p>
+</div>
+<div class="paragraph">
+<p>Elm might take a while to get used to if you come from an imperative programming background.
+It aims at being as pure as possible so the way you handle side effects (like keypresses, field inputs or even dates) might seem odd coming from vanilla JS.</p>
+</div>
+<div class="paragraph">
+<p>But so far I like it, but that is just me, so <strong>YMMV</strong> like they say.</p>
+</div>
+</div>
+</div>
+        </section>
+
+        
+
+        <footer class="post-footer">
+            <!-- If we want to display author's name and bio -->
+            
+                <figure class="author-image">
+                    <a class="img" href="/" style="background-image: url(/assets/images/profile.png)">
+                    <span class="hidden">Guillaume Belrose's Picture</span></a>
+                </figure>
+                <section class="author">
+                    <!-- Author Name -->
+                    <h4> Guillaume Belrose </h4>
+                    <!-- Author Bio -->
+                    <p>
+                        Call me "G" and follow me on Twitter <a href="http://www.twitter.com/gbelrose">@gbelrose</a>
+                    </p>
+                </section>
+            
+
+            <!-- Share links section -->
+            <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?text=Learning Elm&amp;url=http://kafecho.github.io/elm/javascript/functionalprogramming/2016/11/08/learning-elm.html"
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://kafecho.github.io/elm/javascript/functionalprogramming/2016/11/08/learning-elm.html"
+        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://kafecho.github.io/elm/javascript/functionalprogramming/2016/11/08/learning-elm.html"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+            
+  <div id="disqus_thread"></div>
+  <script>
+  /**
+  * RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+  * LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+  */
+  var disqus_config = function () {
+    this.page.url = "http://kafecho.github.io/blog/elm/javascript/functionalprogramming/2016/11/08/learning-elm.html"; // Replace PAGE_URL with your page's canonical URL variable
+  this.page.identifier = "kafecho.github.io/blog/elm/javascript/functionalprogramming/2016/11/08/learning-elm.html"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+  };
+  (function() { // DON'T EDIT BELOW THIS LINE
+  var d = document, s = d.createElement('script');
+
+  s.src = '//head-in-the-clouds.disqus.com/embed.js';
+
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+  })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+        </footer>
+
+    </article>
+
+</main>
+
+    <footer class="site-footer clearfix">
+      <section class="copyright">
+        <a href="/">Head In The Clouds</a> &copy; 2016 &bull; All rights reserved.
+      </section>
+      <section class="poweredby">Made with Jekyll using <a href="http://github.com/rosario/kasper">Kasper theme</a>
+      </section>
+    </footer>
+
+    <script type="text/javascript" src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+
+    <!-- Google Analytics Tracking code -->
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-XXXXXXXX-X']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+</body>
+</html>
