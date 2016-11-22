@@ -3,10 +3,10 @@
   <channel>
     <title></title>
     <description>Guillaume's musings</description>
-    <link>http://kafecho.github.io//</link>
-    <atom:link href="http://kafecho.github.io//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 22 Nov 2016 09:26:28 +0200</pubDate>
-    <lastBuildDate>Tue, 22 Nov 2016 09:26:28 +0200</lastBuildDate>
+    <link>http://kafecho.github.io/</link>
+    <atom:link href="http://kafecho.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 22 Nov 2016 10:20:53 +0200</pubDate>
+    <lastBuildDate>Tue, 22 Nov 2016 10:20:53 +0200</lastBuildDate>
     <generator>Jekyll v3.2.1</generator>
     
       <item>
@@ -118,8 +118,8 @@
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 17 Nov 2016 00:00:00 +0200</pubDate>
-        <link>http://kafecho.github.io//ansible/devops/2016/11/17/ad-hoc-ansible-role.html</link>
-        <guid isPermaLink="true">http://kafecho.github.io//ansible/devops/2016/11/17/ad-hoc-ansible-role.html</guid>
+        <link>http://kafecho.github.io/ansible/devops/2016/11/17/ad-hoc-ansible-role.html</link>
+        <guid isPermaLink="true">http://kafecho.github.io/ansible/devops/2016/11/17/ad-hoc-ansible-role.html</guid>
         
         
         <category>Ansible</category>
@@ -504,8 +504,8 @@ It aims at being as pure as possible so the way you handle side effects (like ke
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 08 Nov 2016 00:00:00 +0200</pubDate>
-        <link>http://kafecho.github.io//elm/javascript/functionalprogramming/2016/11/08/learning-elm.html</link>
-        <guid isPermaLink="true">http://kafecho.github.io//elm/javascript/functionalprogramming/2016/11/08/learning-elm.html</guid>
+        <link>http://kafecho.github.io/elm/javascript/functionalprogramming/2016/11/08/learning-elm.html</link>
+        <guid isPermaLink="true">http://kafecho.github.io/elm/javascript/functionalprogramming/2016/11/08/learning-elm.html</guid>
         
         
         <category>Elm</category>
@@ -583,8 +583,8 @@ It aims at being as pure as possible so the way you handle side effects (like ke
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 08 Nov 2016 00:00:00 +0200</pubDate>
-        <link>http://kafecho.github.io//hello/2016/11/08/hello-world.html</link>
-        <guid isPermaLink="true">http://kafecho.github.io//hello/2016/11/08/hello-world.html</guid>
+        <link>http://kafecho.github.io/hello/2016/11/08/hello-world.html</link>
+        <guid isPermaLink="true">http://kafecho.github.io/hello/2016/11/08/hello-world.html</guid>
         
         
         <category>Hello</category>
