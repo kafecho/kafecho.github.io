@@ -5,9 +5,36 @@
     <description>Guillaume's musings</description>
     <link>http://kafecho.github.io/</link>
     <atom:link href="http://kafecho.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 16 Dec 2016 10:46:09 +0200</pubDate>
-    <lastBuildDate>Fri, 16 Dec 2016 10:46:09 +0200</lastBuildDate>
+    <pubDate>Mon, 30 Jan 2017 22:08:52 +0200</pubDate>
+    <lastBuildDate>Mon, 30 Jan 2017 22:08:52 +0200</lastBuildDate>
     <generator>Jekyll v3.2.1</generator>
+    
+      <item>
+        <title>Another Scala intro.</title>
+        <description>&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I gave yet another Scala intro talk at the Java Jozi JUG.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;It had been a while since my last Scala talk, and while preparing for it, I realized how my Scala coding style has changed over the years.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The 2017 edition definitely has a strong &lt;strong&gt;Functional Programming&lt;/strong&gt; flavour.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The slides are very high level and cover a tiny spectrum of the language. There are here: &lt;a href=&quot;http://kafecho.github.io/assets/presentations/scala-in-15-minutes-jozi-jug-30-01-2017.pdf&quot; class=&quot;bare&quot;&gt;http://kafecho.github.io/assets/presentations/scala-in-15-minutes-jozi-jug-30-01-2017.pdf&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;</description>
+        <pubDate>Mon, 30 Jan 2017 00:00:00 +0200</pubDate>
+        <link>http://kafecho.github.io/scala/java/jug/2017/01/30/scala-lightning-talk.html</link>
+        <guid isPermaLink="true">http://kafecho.github.io/scala/java/jug/2017/01/30/scala-lightning-talk.html</guid>
+        
+        
+        <category>Scala</category>
+        
+        <category>Java</category>
+        
+        <category>JUG</category>
+        
+      </item>
     
       <item>
         <title>The Batmanacci Sequence</title>
