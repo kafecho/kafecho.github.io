@@ -5,9 +5,63 @@
     <description>Guillaume's musings</description>
     <link>http://kafecho.github.io/</link>
     <atom:link href="http://kafecho.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 30 Jan 2017 22:08:52 +0200</pubDate>
-    <lastBuildDate>Mon, 30 Jan 2017 22:08:52 +0200</lastBuildDate>
+    <pubDate>Sat, 13 May 2017 10:43:15 +0200</pubDate>
+    <lastBuildDate>Sat, 13 May 2017 10:43:15 +0200</lastBuildDate>
     <generator>Jekyll v3.2.1</generator>
+    
+      <item>
+        <title>Introduction to Elm</title>
+        <description>&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Back in April, I gave an introduction to Elm at the Lambda Luminaries Meetup in Johannesburg (see &lt;a href=&quot;https://www.meetup.com/lambda-luminaries/events/237238223/&quot; class=&quot;bare&quot;&gt;https://www.meetup.com/lambda-luminaries/events/237238223/&lt;/a&gt;).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Many thanks to Invesco Jemstep (&lt;a href=&quot;https://www.jemstep.com/en&quot; class=&quot;bare&quot;&gt;https://www.jemstep.com/en&lt;/a&gt;) for hosting the event and feeding us delicious pizzas.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;My talk was roughly structured like the official Elm tutorial (the one at &lt;a href=&quot;https://guide.elm-lang.org/install.html&quot; class=&quot;bare&quot;&gt;https://guide.elm-lang.org/install.html&lt;/a&gt;). I covered the following:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Language syntax&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The virtual DOM&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The Elm architecture&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Ports&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The Elm community&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I thought the talk ended up a bit too long (it&amp;#8217;s rather hard to cover a language within 45 minutes ~ 1 hour), but I think it was well received and I got good feedback.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;During the talk, I did a bunch of demos (including a live one), as I think it is sometimes the most effective way of explaining particular aspects of a language.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If you are interested, the slides (done with &lt;strong&gt;Deckset&lt;/strong&gt;) and demos are available on Github at: &lt;a href=&quot;https://github.com/kafecho/Lambda-Luminaries-Meetup-2017&quot; class=&quot;bare&quot;&gt;https://github.com/kafecho/Lambda-Luminaries-Meetup-2017&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As we normally give away prizes at each Meetup, I wrote a simple prize draw app in Elm to pick winners at random (&lt;a href=&quot;https://github.com/kafecho/Lambda-Luminaries-Meetup-2017/blob/master/Demos/PrizeDraw.elm&quot; class=&quot;bare&quot;&gt;https://github.com/kafecho/Lambda-Luminaries-Meetup-2017/blob/master/Demos/PrizeDraw.elm&lt;/a&gt;).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;It&amp;#8217;s nothing too complicated, with I like that there is a clearly defined model (albeit small) and a well defined set of union types that the compiler can check out for.&lt;/p&gt;
+&lt;/div&gt;</description>
+        <pubDate>Sat, 13 May 2017 00:00:00 +0200</pubDate>
+        <link>http://kafecho.github.io/elm/2017/05/13/introduction-to-elm.html</link>
+        <guid isPermaLink="true">http://kafecho.github.io/elm/2017/05/13/introduction-to-elm.html</guid>
+        
+        
+        <category>Elm</category>
+        
+      </item>
     
       <item>
         <title>Another Scala intro.</title>
