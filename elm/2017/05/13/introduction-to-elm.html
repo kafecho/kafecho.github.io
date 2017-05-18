@@ -59,18 +59,19 @@
 
         <section class="post-content">
             <div class="paragraph">
-<p>Back in April, I gave an introduction to Elm at the Lambda Luminaries Meetup in Johannesburg (see <a href="https://www.meetup.com/lambda-luminaries/events/237238223/" class="bare">https://www.meetup.com/lambda-luminaries/events/237238223/</a>).</p>
+<p>Back in April, I gave an <a href="https://www.meetup.com/lambda-luminaries/events/237238223/">Introduction to Elm</a> talk at the Johannesburg-based Lambda Luminaries Meetup hosted by <a href="https://www.jemstep.com/en">Invesco Jemstep</a>.
+My talk was roughly structured like the official <a href="https://guide.elm-lang.org/install.html">Elm tutorial</a> and I used a mixture of slides and demos to explain various concepts.</p>
 </div>
+<div class="sect1">
+<h2 id="_talk-structure">Talk structure</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>Many thanks to Invesco Jemstep (<a href="https://www.jemstep.com/en" class="bare">https://www.jemstep.com/en</a>) for hosting the event and feeding us delicious pizzas.</p>
-</div>
-<div class="paragraph">
-<p>My talk was roughly structured like the official Elm tutorial (the one at <a href="https://guide.elm-lang.org/install.html" class="bare">https://guide.elm-lang.org/install.html</a>). I covered the following:</p>
+<p>I covered the following:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Language syntax</p>
+<p>Language syntax (literal, functions, currying)</p>
 </li>
 <li>
 <p>The virtual DOM</p>
@@ -87,19 +88,65 @@
 </ul>
 </div>
 <div class="paragraph">
-<p>I thought the talk ended up a bit too long (it&#8217;s rather hard to cover a language within 45 minutes ~ 1 hour), but I think it was well received and I got good feedback.</p>
+<p>As we had quite a lot of ground to cover, the talk ended up a bit too long (it&#8217;s rather hard to cover a language from scratch within 45 minutes ~ 1 hour), but I think it was well received and I got some good feedback.</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_slides-and-demos">Slides and demos</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>During the talk, I did a bunch of demos (including a live one), as I think it is sometimes the most effective way of explaining particular aspects of a language.</p>
 </div>
 <div class="paragraph">
-<p>If you are interested, the slides (done with <strong>Deckset</strong>) and demos are available on Github at: <a href="https://github.com/kafecho/Lambda-Luminaries-Meetup-2017" class="bare">https://github.com/kafecho/Lambda-Luminaries-Meetup-2017</a></p>
+<p>If you are interested, the <a href="https://github.com/kafecho/Lambda-Luminaries-Meetup-2017/blob/master/slides.md">slides</a> (made with <strong>Deckset</strong>) and <a href="https://github.com/kafecho/Lambda-Luminaries-Meetup-2017/tree/master/Demos">demos</a> are available on Github.</p>
 </div>
 <div class="paragraph">
-<p>As we normally give away prizes at each Meetup, I wrote a simple prize draw app in Elm to pick winners at random (<a href="https://github.com/kafecho/Lambda-Luminaries-Meetup-2017/blob/master/Demos/PrizeDraw.elm" class="bare">https://github.com/kafecho/Lambda-Luminaries-Meetup-2017/blob/master/Demos/PrizeDraw.elm</a>).</p>
+<p>In particular I did the following demos (refer to the particular files in the Git repo):</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>HelloMeetup.elm: a simple app to illustrate how to build up a <strong>static</strong> page via the Virtual DOM.</p>
+</li>
+<li>
+<p>Angular.elm: to illustrate how to implement Angular-style binding in Elm using the Elm architecture. The Elm code ends up being quite long, but with <strong>0% magic</strong> in it.</p>
+</li>
+<li>
+<p>Weather.elm: an Elm app which talks HTTP to the Yahoo Weather API to fetch and display the weather for some South Africa cities. This demonstrates how to use the Elm architecture for calling out to an HTTP service.</p>
+</li>
+<li>
+<p>Trailer.elm: a simple Elm app using ports to control HTML5 video playback via keyboard events (play/pause/skip frames, etc&#8230;&#8203;). Kudos to <a href="http://vincent.jousse.org/en/tech/interacting-with-dom-element-using-elm-audio-video/">Vincent Jousse</a> for the inspiration.</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
-<p>It&#8217;s nothing too complicated, with I like that there is a clearly defined model (albeit small) and a well defined set of union types that the compiler can check out for.</p>
+<p>As we normally give away prizes at each Lambda Luminaries Meetup (JetBrains license, Manning eBooks), I wrote a prize draw app in Elm to pick winners at random (<a href="https://github.com/kafecho/Lambda-Luminaries-Meetup-2017/blob/master/Demos/PrizeDraw.elm" class="bare">https://github.com/kafecho/Lambda-Luminaries-Meetup-2017/blob/master/Demos/PrizeDraw.elm</a>).</p>
+</div>
+<div class="paragraph">
+<p>The app uses the Random side-effect facility built-in the Elm architecture to pick a winner at random (from the list of Meetup participants).
+The winner can then accept or refuse the prize. The process continues until all the prizes have been given away.
+It&#8217;s nothing too complicated, but I like that there is a clearly defined model (albeit small) and a well defined set of union types that the compiler can check out for.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the-making-of">The making of</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A couple of observations. While working on the demos, I relied heavily on the Elm compiler to fix my mistakes.
+Most of the time, I would just refactor the code until it compiled and in most cases, it would just work the 1st time it compiled.</p>
+</div>
+<div class="paragraph">
+<p>The Weather demo involved making HTTP calls and JSON decoding which I did struggle with at times.
+I found that I had to result to Elm Debug to understand what was going.
+Compared with Vanilla JS, this part of Elm felt too complicated, especially when you are used to Ajax and just poking inside JSON until you find what you want.</p>
+</div>
+<div class="paragraph">
+<p>The port demo (Trailer.elm) turned out to be quite simple with not too much JS boiler plate involved.
+Relying on Elm to handle the state and events and Vanilla JS to be a pure render engine worked out quite well in this case.</p>
+</div>
+</div>
 </div>
         </section>
 
@@ -109,7 +156,7 @@
             <!-- If we want to display author's name and bio -->
             
                 <figure class="author-image">
-                    <a class="img" href="/" style="background-image: url(/assets/images/profile.png)">
+                    <a class="img" href="/" style="background-image: url(/assets/images/profile.jpg)">
                     <span class="hidden">Guillaume Belrose's Picture</span></a>
                 </figure>
                 <section class="author">
@@ -140,6 +187,27 @@
 </section>
 
             
+  <div id="disqus_thread"></div>
+  <script>
+  /**
+  * RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+  * LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+  */
+  var disqus_config = function () {
+    this.page.url = "http://kafecho.github.io/elm/2017/05/13/introduction-to-elm.html"; // Replace PAGE_URL with your page's canonical URL variable
+  this.page.identifier = "kafecho.github.io/elm/2017/05/13/introduction-to-elm.html"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+  };
+  (function() { // DON'T EDIT BELOW THIS LINE
+  var d = document, s = d.createElement('script');
+
+  s.src = '//head-in-the-clouds.disqus.com/embed.js';
+
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+  })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
 
         </footer>
 

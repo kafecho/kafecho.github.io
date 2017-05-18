@@ -5,25 +5,26 @@
     <description>Guillaume's musings</description>
     <link>http://kafecho.github.io/</link>
     <atom:link href="http://kafecho.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 13 May 2017 10:43:15 +0200</pubDate>
-    <lastBuildDate>Sat, 13 May 2017 10:43:15 +0200</lastBuildDate>
-    <generator>Jekyll v3.2.1</generator>
+    <pubDate>Thu, 18 May 2017 15:21:52 +0200</pubDate>
+    <lastBuildDate>Thu, 18 May 2017 15:21:52 +0200</lastBuildDate>
+    <generator>Jekyll v3.4.3</generator>
     
       <item>
         <title>Introduction to Elm</title>
         <description>&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Back in April, I gave an introduction to Elm at the Lambda Luminaries Meetup in Johannesburg (see &lt;a href=&quot;https://www.meetup.com/lambda-luminaries/events/237238223/&quot; class=&quot;bare&quot;&gt;https://www.meetup.com/lambda-luminaries/events/237238223/&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;Back in April, I gave an &lt;a href=&quot;https://www.meetup.com/lambda-luminaries/events/237238223/&quot;&gt;Introduction to Elm&lt;/a&gt; talk at the Johannesburg-based Lambda Luminaries Meetup hosted by &lt;a href=&quot;https://www.jemstep.com/en&quot;&gt;Invesco Jemstep&lt;/a&gt;.
+My talk was roughly structured like the official &lt;a href=&quot;https://guide.elm-lang.org/install.html&quot;&gt;Elm tutorial&lt;/a&gt; and I used a mixture of slides and demos to explain various concepts.&lt;/p&gt;
 &lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_talk-structure&quot;&gt;Talk structure&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Many thanks to Invesco Jemstep (&lt;a href=&quot;https://www.jemstep.com/en&quot; class=&quot;bare&quot;&gt;https://www.jemstep.com/en&lt;/a&gt;) for hosting the event and feeding us delicious pizzas.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;My talk was roughly structured like the official Elm tutorial (the one at &lt;a href=&quot;https://guide.elm-lang.org/install.html&quot; class=&quot;bare&quot;&gt;https://guide.elm-lang.org/install.html&lt;/a&gt;). I covered the following:&lt;/p&gt;
+&lt;p&gt;I covered the following:&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;Language syntax&lt;/p&gt;
+&lt;p&gt;Language syntax (literal, functions, currying)&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;The virtual DOM&lt;/p&gt;
@@ -40,19 +41,65 @@
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;I thought the talk ended up a bit too long (it&amp;#8217;s rather hard to cover a language within 45 minutes ~ 1 hour), but I think it was well received and I got good feedback.&lt;/p&gt;
+&lt;p&gt;As we had quite a lot of ground to cover, the talk ended up a bit too long (it&amp;#8217;s rather hard to cover a language from scratch within 45 minutes ~ 1 hour), but I think it was well received and I got some good feedback.&lt;/p&gt;
 &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_slides-and-demos&quot;&gt;Slides and demos&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;During the talk, I did a bunch of demos (including a live one), as I think it is sometimes the most effective way of explaining particular aspects of a language.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;If you are interested, the slides (done with &lt;strong&gt;Deckset&lt;/strong&gt;) and demos are available on Github at: &lt;a href=&quot;https://github.com/kafecho/Lambda-Luminaries-Meetup-2017&quot; class=&quot;bare&quot;&gt;https://github.com/kafecho/Lambda-Luminaries-Meetup-2017&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;If you are interested, the &lt;a href=&quot;https://github.com/kafecho/Lambda-Luminaries-Meetup-2017/blob/master/slides.md&quot;&gt;slides&lt;/a&gt; (made with &lt;strong&gt;Deckset&lt;/strong&gt;) and &lt;a href=&quot;https://github.com/kafecho/Lambda-Luminaries-Meetup-2017/tree/master/Demos&quot;&gt;demos&lt;/a&gt; are available on Github.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;As we normally give away prizes at each Meetup, I wrote a simple prize draw app in Elm to pick winners at random (&lt;a href=&quot;https://github.com/kafecho/Lambda-Luminaries-Meetup-2017/blob/master/Demos/PrizeDraw.elm&quot; class=&quot;bare&quot;&gt;https://github.com/kafecho/Lambda-Luminaries-Meetup-2017/blob/master/Demos/PrizeDraw.elm&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;In particular I did the following demos (refer to the particular files in the Git repo):&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;HelloMeetup.elm: a simple app to illustrate how to build up a &lt;strong&gt;static&lt;/strong&gt; page via the Virtual DOM.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Angular.elm: to illustrate how to implement Angular-style binding in Elm using the Elm architecture. The Elm code ends up being quite long, but with &lt;strong&gt;0% magic&lt;/strong&gt; in it.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Weather.elm: an Elm app which talks HTTP to the Yahoo Weather API to fetch and display the weather for some South Africa cities. This demonstrates how to use the Elm architecture for calling out to an HTTP service.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Trailer.elm: a simple Elm app using ports to control HTML5 video playback via keyboard events (play/pause/skip frames, etc&amp;#8230;&amp;#8203;). Kudos to &lt;a href=&quot;http://vincent.jousse.org/en/tech/interacting-with-dom-element-using-elm-audio-video/&quot;&gt;Vincent Jousse&lt;/a&gt; for the inspiration.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;It&amp;#8217;s nothing too complicated, with I like that there is a clearly defined model (albeit small) and a well defined set of union types that the compiler can check out for.&lt;/p&gt;
+&lt;p&gt;As we normally give away prizes at each Lambda Luminaries Meetup (JetBrains license, Manning eBooks), I wrote a prize draw app in Elm to pick winners at random (&lt;a href=&quot;https://github.com/kafecho/Lambda-Luminaries-Meetup-2017/blob/master/Demos/PrizeDraw.elm&quot; class=&quot;bare&quot;&gt;https://github.com/kafecho/Lambda-Luminaries-Meetup-2017/blob/master/Demos/PrizeDraw.elm&lt;/a&gt;).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The app uses the Random side-effect facility built-in the Elm architecture to pick a winner at random (from the list of Meetup participants).
+The winner can then accept or refuse the prize. The process continues until all the prizes have been given away.
+It&amp;#8217;s nothing too complicated, but I like that there is a clearly defined model (albeit small) and a well defined set of union types that the compiler can check out for.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_the-making-of&quot;&gt;The making of&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;A couple of observations. While working on the demos, I relied heavily on the Elm compiler to fix my mistakes.
+Most of the time, I would just refactor the code until it compiled and in most cases, it would just work the 1st time it compiled.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The Weather demo involved making HTTP calls and JSON decoding which I did struggle with at times.
+I found that I had to result to Elm Debug to understand what was going.
+Compared with Vanilla JS, this part of Elm felt too complicated, especially when you are used to Ajax and just poking inside JSON until you find what you want.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The port demo (Trailer.elm) turned out to be quite simple with not too much JS boiler plate involved.
+Relying on Elm to handle the state and events and Vanilla JS to be a pure render engine worked out quite well in this case.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Sat, 13 May 2017 00:00:00 +0200</pubDate>
         <link>http://kafecho.github.io/elm/2017/05/13/introduction-to-elm.html</link>
