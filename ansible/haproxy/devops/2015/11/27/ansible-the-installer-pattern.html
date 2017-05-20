@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+    <title>Head In The Clouds - Guillaume's musings</title>
+    <meta name="description" content="" />
+
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="MobileOptimized" content="320" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <!-- Customisation  -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/main.css" />
+
+</head>
+<body class="home-template">
+
+    <header class="main-header post-head no-cover">
+    <nav class="main-nav  clearfix">
+        <a class="back-button icon-arrow-left" href="/">Home</a>
+        <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+    </nav>
+</header>
+
+<main class="content" role="main">
+
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">Ansible: the installer pattern</h1>
+            <section class="post-meta">
+                <time class="post-date" datetime="2015-11-27">27 Nov 2015</time>
+                
+                    on Ansible, HAProxy, and DevOps
+                
+            </section>
+        </header>
+
+<!--         <header class="post-header">
+            <a id="blog-logo" href="http://kafecho.github.io">
+                
+                    <span class="blog-title">Head In The Clouds</span>
+                
+            </a>
+        </header> -->
+
+        <!-- <span class="post-meta">
+            <time datetime="2015-11-27">27 Nov 2015</time>
+            
+                on Ansible, HAProxy, and DevOps
+            
+        </span> -->
+
+        <!-- <h1 class="post-title">Ansible: the installer pattern</h1> -->
+
+        <section class="post-content">
+            <div class="paragraph">
+<p>In this post, I will talk about an approach for doing configuration management in environments where the network is locked down and your target nodes don&#8217;t have access to the Internet.</p>
+</div>
+<div class="sect1">
+<h2 id="_a-bit-of-context">A bit of context</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In my day job, I write software systems that help media companies (think BBC, ESPN) put together content (think news) that will be broacast to air.
+Over the years, software has morphed to become ever more sophisticated with ever more moving parts.
+We are no longer configuring a single executable that run on a Windows PC, we are producing systems that have to be correctly installed, configured and monitored.
+I&#8217;ve been investing a lot of effort with Automate-all-the-things Ansible and today, we have a rather extensive set of roles for deploying pretty much all we need, from JVMs all the way to HA clusters and monitoring tools.</p>
+</div>
+<div class="paragraph">
+<p>A newsroom environment (as made popular by Aaron Sorkin&#8217;s The Newsroom TV series) is a fairly controlled space. During a visit to the BBC production facility back in May this year, I had to put my laptop&#8217;s power supply through a set of tests (in case it caused interferences with the broadcast signals). Likewise, there were no microwave ovens in sight in the lunch area (again, because they could issues and fry live radio transmissions). To add to the fun, in this production environment, machines tend to be locked down; they are often configured to block access to the outside world (the Internet). So your vanilla Ansible roles which download stuff from the internet won&#8217;t fly.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the-solution">The solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The solution we&#8217;ve settled for is what I call the Ansible installer pattern. In this instance, the installer is a Linux node (I use CentOS) which contains pre-cached dependencies. The installer lives within the customer&#8217;s Intranet. It runs Ansible with an Apache web server. At deployment time, the installer uses roles which instructs the target nodes to go and fetch rpms and other files from its web server (the so-called phone home pattern).</p>
+</div>
+<div class="paragraph">
+<p>I&#8217;ve experimented with various approaches to build the installer (all with Ansible):</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>as a complete OS image (built with Vagrant / VirtualBox)</p>
+</li>
+<li>
+<p>as a docker container</p>
+</li>
+<li>
+<p>as a self contained tar file that can be unpacked and used on any vanilla CentOS machine.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>We eventually settled for the last option. In the remainder of this post, I will describe how it works.</p>
+</div>
+<div class="paragraph">
+<p>To build the installer tar file, we launch a vanilla CentOS virtual machine (think of it as a golden installer) which we configure with Ansible. Ansible creates the cache folder and then runs a bunch of roles to cache various dependencies. In addition, Ansible fetches the packages to install Apache and the packages to install itself (so the system can be bootstraped). At the end; we are left with a folder,a bunch of scripts and some Ansible playbooks used for deployment. The folder is then archived and zipped using tar. The tar archive can be copied to any plain CentOS node that can then be used as an installer. Building the tar file is fully automated using Jenkins and Ansible.</p>
+</div>
+<div class="paragraph">
+<p>To make things more concrete, let&#8217;s say you want to deploy the HAProxy load balancer, with this approach, you essentially have to write 2 roles.
+The purpose of the 1st role is to cache all the dependencies that are required to install HAProxy. This role is executed when the installer tar file is built. It looks like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="yaml"><span style="color: #0000FF; font-weight: bold">---</span>
+- name: cache the rpms required to install HAProxy
+  shell: repotrack -p {{ rpms_root }} haproxy</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The variable rpms_root point to a fixed location (i.e. the cache).</p>
+</div>
+<div class="paragraph">
+<p>At deployment time, we use a different role that installs HAProxy from the rpms that have been cached.
+The role looks just like what you would write if the node had access to the Internet, except if uses a special purpose yum repository (here called ansible).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="yaml"><span style="color: #0000FF; font-weight: bold">---</span>
+- name: install HAProxy
+  shell: yum install -y haproxy --disablerepo=* --enablerepo=ansible
+
+- name: customize HAProxy to serve HTTP traffic to the designated downstream servers
+  template: src=haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg owner=haproxy group=haproxy
+  notify: restart_haproxy
+
+- name: ensure HAProxy is started and enabled at boot time
+  service: name=haproxy state=started enabled=yes</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>At deployment time, the installer adds the special ansible yum repository on all the target nodes. The yum repo is derived from a template that looks like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="ini"><span style="color: #008000; font-weight: bold">[ansible]</span>
+<span style="color: #7D9029">name</span><span style="color: #666666">=</span><span style="color: #BA2121">Ansible</span>
+<span style="color: #7D9029">baseurl</span><span style="color: #666666">=</span><span style="color: #BA2121">http://{{ deployment_node_ip }}/rpms</span>
+<span style="color: #7D9029">enabled</span><span style="color: #666666">=</span><span style="color: #BA2121">1</span>
+<span style="color: #7D9029">gpgcheck</span><span style="color: #666666">=</span><span style="color: #BA2121">0</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In other words, at deployment time, each node knows where to go to find the RPM to install. deployment_node_ip points to the IP address of the installer node.</p>
+</div>
+<div class="paragraph">
+<p>I&#8217;ve tested this approach with CentOS nodes, but it should work (with some changes obviously, pick your favourite package manager) on other Linux distributions. I&#8217;ve also tested caching and deploying Windows applications. It works quite well, but extra steps are required to download all the dependencies required to setup WinRM connections.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_pros-and-cons">Pros and cons</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>An obvious benefit of the installer pattern is that it makes deployments quite a bit faster since everything is pre-cached. If you have to install a large package on a set of nodes (for example, a SolrCloud cluster) then the speedups can be quite substantial. If you have to deploy a full stack (from app to monitoring on multiple nodes), then even more so. From start to finish, our complex stack takes about 7 minutes to deploy and configure. The obvious downside of the approach is that it forces you to split your deployment into 2 stages (cache and install). Testing also requires a bit more rigour as you really need to ensure that your target machines are cut of from the Internet (otherwise you might be testing the wrong thing). For that I use Vagrant to launch clusters using private networks configured with no Internet access.</p>
+</div>
+<div class="paragraph">
+<p>Most people nowadays are lucky enough to host things in the Cloud or on their own infrastructure. If you are not, and if tightly controlled environments are an issue for you, I am hoping that you&#8217;ve found this post useful.</p>
+</div>
+<div class="paragraph">
+<p>As always, comments and questions are welcome.</p>
+</div>
+<div class="paragraph">
+<p>Guillaume.</p>
+</div>
+</div>
+</div>
+        </section>
+
+        
+
+        <footer class="post-footer">
+            <!-- If we want to display author's name and bio -->
+            
+                <figure class="author-image">
+                    <a class="img" href="/" style="background-image: url(/assets/images/profile.jpg)">
+                    <span class="hidden">Guillaume Belrose's Picture</span></a>
+                </figure>
+                <section class="author">
+                    <!-- Author Name -->
+                    <h4> Guillaume Belrose </h4>
+                    <!-- Author Bio -->
+                    <p>
+                        Call me "G" and follow me on Twitter <a href="http://www.twitter.com/gbelrose">@gbelrose</a>
+                    </p>
+                </section>
+            
+
+            <!-- Share links section -->
+            <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?text=Ansible: the installer pattern&amp;url=http://kafecho.github.io/ansible/haproxy/devops/2015/11/27/ansible-the-installer-pattern.html"
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://kafecho.github.io/ansible/haproxy/devops/2015/11/27/ansible-the-installer-pattern.html"
+        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://kafecho.github.io/ansible/haproxy/devops/2015/11/27/ansible-the-installer-pattern.html"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+            
+  <div id="disqus_thread"></div>
+  <script>
+  /**
+  * RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+  * LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+  */
+  var disqus_config = function () {
+    this.page.url = "http://kafecho.github.io/ansible/haproxy/devops/2015/11/27/ansible-the-installer-pattern.html"; // Replace PAGE_URL with your page's canonical URL variable
+  this.page.identifier = "kafecho.github.io/ansible/haproxy/devops/2015/11/27/ansible-the-installer-pattern.html"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+  };
+  (function() { // DON'T EDIT BELOW THIS LINE
+  var d = document, s = d.createElement('script');
+
+  s.src = '//head-in-the-clouds.disqus.com/embed.js';
+
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+  })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+        </footer>
+
+    </article>
+
+</main>
+
+    <footer class="site-footer clearfix">
+      <section class="copyright">
+        <a href="/">Head In The Clouds</a> &copy; 2017 &bull; All rights reserved.
+      </section>
+      <section class="poweredby">Made with Jekyll using <a href="http://github.com/rosario/kasper">Kasper theme</a>
+      </section>
+    </footer>
+
+    <script type="text/javascript" src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+
+    <!-- Google Analytics Tracking code -->
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-XXXXXXXX-X']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+</body>
+</html>

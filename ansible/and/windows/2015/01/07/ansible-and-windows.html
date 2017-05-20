@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+    <title>Head In The Clouds - Guillaume's musings</title>
+    <meta name="description" content="" />
+
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="MobileOptimized" content="320" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <!-- Customisation  -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/main.css" />
+
+</head>
+<body class="home-template">
+
+    <header class="main-header post-head no-cover">
+    <nav class="main-nav  clearfix">
+        <a class="back-button icon-arrow-left" href="/">Home</a>
+        <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+    </nav>
+</header>
+
+<main class="content" role="main">
+
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">Ansible and Windows</h1>
+            <section class="post-meta">
+                <time class="post-date" datetime="2015-01-07">07 Jan 2015</time>
+                
+                    on Ansible, and, and Windows
+                
+            </section>
+        </header>
+
+<!--         <header class="post-header">
+            <a id="blog-logo" href="http://kafecho.github.io">
+                
+                    <span class="blog-title">Head In The Clouds</span>
+                
+            </a>
+        </header> -->
+
+        <!-- <span class="post-meta">
+            <time datetime="2015-01-07">07 Jan 2015</time>
+            
+                on Ansible, and, and Windows
+            
+        </span> -->
+
+        <!-- <h1 class="post-title">Ansible and Windows</h1> -->
+
+        <section class="post-content">
+            <div class="paragraph">
+<p>In this post, we are going to be looking at how to use Ansible to manage Windows systems.</p>
+</div>
+<div class="sect1">
+<h2 id="_context">Context</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>I&#8217;ve been tasked to look at various configuration management solutions to setup and manage Windows machine.</p>
+</div>
+<div class="paragraph">
+<p>As I already use Ansible in quite a few places on Linux, I decided to try the relatively new Windows support (as of 1.7).
+I set myself a fairly simple task, that is installing and configuring CouchDB from scratch.
+I later added the ability to install Microsoft Silverlight.</p>
+</div>
+<div class="paragraph">
+<p>Setting up the Windows environment was fairly straightforward, I just followed the instructions from the Ansible website and I was able to setup my Windows7 box with WinRM.</p>
+</div>
+<div class="paragraph">
+<p>Ansible has managed to keep the same operating model on both Windows and Linux: it&#8217;s all agent-less, you can invoke ad-hoc commands on both Windows and Linux, and even write Playbooks where some sections take place on Windows while others on Linux.
+The list of Windows specific modules is a bit small (but hopefully growing).</p>
+</div>
+<div class="paragraph">
+<p>For my particular job, I needed to tweak the CouchDB configuration once it is installed.
+Normally on Linux, I would use the template module, which is not yet available on Windows.
+I eventually settled for a hybrid option, where I apply the template locally on the Linux 'master' node and then I instruct the Windows box to fetch the templated content via http (I run an HTTP server on my Ansible 'master' node).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the-playbooks">The playbooks</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Here is what the Playbook looks like.</p>
+</div>
+<div class="paragraph">
+<p>The steps below run on the Ansible 'master' node.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="YAML">- hosts: 127.0.0.1
+  sudo: True
+  connection: local
+  vars:
+   <span style="color: #408080; font-style: italic"># Some customisations to the CouchDB configuration.</span>
+   couchdb_port: 5983
+   couchdb_bind_address: 0.0.0.0
+
+  tasks:
+  <span style="color: #408080; font-style: italic"># I use a web server to serve content from the master node to the windows machine.</span>
+  <span style="color: #408080; font-style: italic"># This approach also enables offline mode, where the Windows node don&#39;t have access to the internet</span>
+  - name: install Apache2 on the Ansible master node
+    yum: name=httpd
+
+  - name: create the ansible folder that will be served by Apache2
+    file: path=/var/www/html/ansible state=directory
+
+  - name: retrieve the Windows installer for CouchDB
+    get_url: url=http://apache.is.co.za/couchdb/binary/win/1.6.1/setup-couchdb-1.6.1_R16B02.exe dest=/var/www/html/ansible/couchdb.exe force=no
+
+  - name: add a copy of the Silverlight windows installer to the web server folder
+    copy: src=Silverlight_x64.exe dest=/var/www/html/ansible/Silverlight_x64.exe
+
+  <span style="color: #408080; font-style: italic"># Templating is not yet supported in Windows, so we template the file on the master node and serve the output via http</span>
+  - name: create a CouchDB local.ini file from a template and save it to the local webserver.
+    template: src=local.ini.j2 dest=/var/www/html/ansible/local.ini
+
+  - name: ensure that Apache2 is running
+    service: name=httpd state=started</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The steps below run on any Windows node in the inventory</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="yaml">- hosts: windows
+  gather_facts: no
+  tasks:
+  <span style="color: #408080; font-style: italic"># We discover the ip address of the master node, so that windows nodes can fetch content over Http from the right place</span>
+  - name: fetch the ip address of the master node
+    local_action: <span style="color: #BA2121">&quot;shell</span><span style="color: #19177C"> </span><span style="color: #BA2121">ifconfig</span><span style="color: #19177C"> </span><span style="color: #BA2121">eth1</span><span style="color: #19177C"> </span><span style="color: #BA2121">|</span><span style="color: #19177C"> </span><span style="color: #BA2121">grep</span><span style="color: #19177C"> </span><span style="color: #BA2121">&#39;inet</span><span style="color: #19177C"> </span><span style="color: #BA2121">addr&#39;</span><span style="color: #19177C"> </span><span style="color: #BA2121">|</span><span style="color: #19177C"> </span><span style="color: #BA2121">awk</span><span style="color: #19177C"> </span><span style="color: #BA2121">-F:</span><span style="color: #19177C"> </span><span style="color: #BA2121">&#39;{print</span><span style="color: #19177C"> </span><span style="color: #BA2121">$2}&#39;</span><span style="color: #19177C"> </span><span style="color: #BA2121">|</span><span style="color: #19177C"> </span><span style="color: #BA2121">awk</span><span style="color: #19177C"> </span><span style="color: #BA2121">&#39;{print</span><span style="color: #19177C"> </span><span style="color: #BA2121">$1}&#39;&quot;</span>
+    register: ansible_master_ip
+
+  - name: download the Silverlight installer from the Ansible master node
+    win_get_url: url=http://{{ ansible_master_ip.stdout }}/ansible/Silverlight_x64.exe  dest=C:\Users\Guillaume\silverlight.exe
+
+  - name: proceed to a silent install of silverlight
+    script: installsilverlight.ps1
+
+  - name: download the couchdb.exe InnoSetup installer from the Ansible master node
+    win_get_url: url=http://{{ ansible_master_ip.stdout }}/ansible/couchdb.exe  dest=C:\Users\Guillaume\couchdb.exe
+
+  - name: ensure that CouchDB is stopped
+    win_service: name=&quot;Apache CouchDB&quot; state=stopped
+    ignore_errors: true
+
+  - name: stop left-over Erlang processes (otherwise, the installation via PowerShell will fail)
+    script: stoperlang.ps1
+
+  - name: proceed to a silent install of couchdb
+    script: installcouchdb.ps1
+
+  - name: customize the CouchDB configuration
+    win_get_url: url=http://{{ ansible_master_ip.stdout }}/ansible/local.ini dest=&#39;C:\Program Files (x86)\Apache Software Foundation\CouchDB\etc\couchdb\local.ini&#39;
+
+  - name: restart couchdb
+    win_service: name=&quot;Apache CouchDB&quot; state=restarted</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_some-thoughts">Some thoughts</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>I do find the Windows philosophy for installing software a bit unusual (it mostly assumes a GUI and someone clicking on things to proceed), but thankfully, I was able to work out the steps to install things silently.</p>
+</div>
+<div class="paragraph">
+<p>Overall, I am quite happy with the result. The next version of Ansible (1.9) should have improved Windows support with extra modules for doing file copy and dealing with templates.</p>
+</div>
+<div class="paragraph">
+<p>Good job to the Ansible team for keeping it very simple.</p>
+</div>
+</div>
+</div>
+        </section>
+
+        
+
+        <footer class="post-footer">
+            <!-- If we want to display author's name and bio -->
+            
+                <figure class="author-image">
+                    <a class="img" href="/" style="background-image: url(/assets/images/profile.jpg)">
+                    <span class="hidden">Guillaume Belrose's Picture</span></a>
+                </figure>
+                <section class="author">
+                    <!-- Author Name -->
+                    <h4> Guillaume Belrose </h4>
+                    <!-- Author Bio -->
+                    <p>
+                        Call me "G" and follow me on Twitter <a href="http://www.twitter.com/gbelrose">@gbelrose</a>
+                    </p>
+                </section>
+            
+
+            <!-- Share links section -->
+            <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?text=Ansible and Windows&amp;url=http://kafecho.github.io/ansible/and/windows/2015/01/07/ansible-and-windows.html"
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://kafecho.github.io/ansible/and/windows/2015/01/07/ansible-and-windows.html"
+        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://kafecho.github.io/ansible/and/windows/2015/01/07/ansible-and-windows.html"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+            
+  <div id="disqus_thread"></div>
+  <script>
+  /**
+  * RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+  * LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+  */
+  var disqus_config = function () {
+    this.page.url = "http://kafecho.github.io/ansible/and/windows/2015/01/07/ansible-and-windows.html"; // Replace PAGE_URL with your page's canonical URL variable
+  this.page.identifier = "kafecho.github.io/ansible/and/windows/2015/01/07/ansible-and-windows.html"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+  };
+  (function() { // DON'T EDIT BELOW THIS LINE
+  var d = document, s = d.createElement('script');
+
+  s.src = '//head-in-the-clouds.disqus.com/embed.js';
+
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+  })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+        </footer>
+
+    </article>
+
+</main>
+
+    <footer class="site-footer clearfix">
+      <section class="copyright">
+        <a href="/">Head In The Clouds</a> &copy; 2017 &bull; All rights reserved.
+      </section>
+      <section class="poweredby">Made with Jekyll using <a href="http://github.com/rosario/kasper">Kasper theme</a>
+      </section>
+    </footer>
+
+    <script type="text/javascript" src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+
+    <!-- Google Analytics Tracking code -->
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-XXXXXXXX-X']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+</body>
+</html>

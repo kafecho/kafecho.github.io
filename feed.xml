@@ -5,8 +5,8 @@
     <description>Guillaume's musings</description>
     <link>http://kafecho.github.io/</link>
     <atom:link href="http://kafecho.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 18 May 2017 15:21:52 +0200</pubDate>
-    <lastBuildDate>Thu, 18 May 2017 15:21:52 +0200</lastBuildDate>
+    <pubDate>Sat, 20 May 2017 13:46:38 +0200</pubDate>
+    <lastBuildDate>Sat, 20 May 2017 13:46:38 +0200</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
     
       <item>
@@ -933,6 +933,371 @@ It aims at being as pure as possible so the way you handle side effects (like ke
         
         
         <category>Hello</category>
+        
+      </item>
+    
+      <item>
+        <title>How to stress test CouchDB with Gatling</title>
+        <description>&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In this blog post, I am going to show you how to use Gatling (&lt;a href=&quot;http://gatling.io/&quot; class=&quot;bare&quot;&gt;http://gatling.io/&lt;/a&gt;) to test the performance of CouchDB&amp;#8217;s HTTP operations.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_what-is-gatling&quot;&gt;What is Gatling?&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Gatling is an HTTP performance tool written in Scala with the Akka and Netty toolkits.
+Via Akka and Netty, Gatling can generate a large amount of load, while making efficient use of threads (those libraries are all based on non-blocking I/O).
+It is a JVM application, therefore, you can run it on a variety of platforms without a problem.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_the-gatling-dsl&quot;&gt;The Gatling DSL&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Gatling provides you with a Domain Specific Language for writing simulations to generate load on (among other things) HTTP-based services such as CouchDB.
+The DSL is written in Scala and provides a fluent interface.
+It provides convenience mechanisms for triggering HTTP methods (GET, PUT, POST, DELETE), as well as simulating wait times and &quot;arrival&quot; times of user.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I&amp;#8217;ve put together a sample Maven project which illustrates one approach for running Gatling stress tests via the command line.
+Have a look at: &lt;a href=&quot;https://github.com/kafecho/gatling-couchdb-simulations&quot; class=&quot;bare&quot;&gt;https://github.com/kafecho/gatling-couchdb-simulations&lt;/a&gt;.
+You only need Apache Maven and a JDK to run the sample.
+Gatling embeds a version of the Scala compiler so you don&amp;#8217;t need to have one running.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The sample project contains a single simulation which does the following against a CouchDB server:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Each synthetic user creates a database&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Each synthetic user proceeds to add a number of JSON docs to that database&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Once documents have been added, each synthetic user deletes the database&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You fill find further instruction on the Github page on how to run the simulation.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_gatling-output&quot;&gt;Gatling output&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Gatling produces nice charts with details about response time and throughput (even for specific HTTP operations) so it gives you and idea of what the performance and bottlenecks are.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Here are some examples:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot; /assets/images/gatling1.png&quot; alt=&quot;gatling1&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot; /assets/images/gatling2.png&quot; alt=&quot;gatling2&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot; /assets/images/gatling3.png&quot; alt=&quot;gatling3&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Previously, I had used similar simulations to stress-test BigCouch clusters and the code can be reused out of the box to test CouchDB 2.0 clusters.
+I&amp;#8217;ve also shared some Ansible recipes to make the deployment of CouchDB 2.0 a bit easier.
+Have a look at &lt;a href=&quot;https://github.com/kafecho/ansible-couchdb2&quot; class=&quot;bare&quot;&gt;https://github.com/kafecho/ansible-couchdb2&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Sun, 31 Jan 2016 00:00:00 +0200</pubDate>
+        <link>http://kafecho.github.io/couchdb/gatling/scala/akka/2016/01/31/how-to-stress-test-couchdb-with-gatling.html</link>
+        <guid isPermaLink="true">http://kafecho.github.io/couchdb/gatling/scala/akka/2016/01/31/how-to-stress-test-couchdb-with-gatling.html</guid>
+        
+        
+        <category>CouchDB</category>
+        
+        <category>Gatling</category>
+        
+        <category>Scala</category>
+        
+        <category>Akka</category>
+        
+      </item>
+    
+      <item>
+        <title>Ansible: the installer pattern</title>
+        <description>&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In this post, I will talk about an approach for doing configuration management in environments where the network is locked down and your target nodes don&amp;#8217;t have access to the Internet.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_a-bit-of-context&quot;&gt;A bit of context&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In my day job, I write software systems that help media companies (think BBC, ESPN) put together content (think news) that will be broacast to air.
+Over the years, software has morphed to become ever more sophisticated with ever more moving parts.
+We are no longer configuring a single executable that run on a Windows PC, we are producing systems that have to be correctly installed, configured and monitored.
+I&amp;#8217;ve been investing a lot of effort with Automate-all-the-things Ansible and today, we have a rather extensive set of roles for deploying pretty much all we need, from JVMs all the way to HA clusters and monitoring tools.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;A newsroom environment (as made popular by Aaron Sorkin&amp;#8217;s The Newsroom TV series) is a fairly controlled space. During a visit to the BBC production facility back in May this year, I had to put my laptop&amp;#8217;s power supply through a set of tests (in case it caused interferences with the broadcast signals). Likewise, there were no microwave ovens in sight in the lunch area (again, because they could issues and fry live radio transmissions). To add to the fun, in this production environment, machines tend to be locked down; they are often configured to block access to the outside world (the Internet). So your vanilla Ansible roles which download stuff from the internet won&amp;#8217;t fly.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_the-solution&quot;&gt;The solution&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The solution we&amp;#8217;ve settled for is what I call the Ansible installer pattern. In this instance, the installer is a Linux node (I use CentOS) which contains pre-cached dependencies. The installer lives within the customer&amp;#8217;s Intranet. It runs Ansible with an Apache web server. At deployment time, the installer uses roles which instructs the target nodes to go and fetch rpms and other files from its web server (the so-called phone home pattern).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I&amp;#8217;ve experimented with various approaches to build the installer (all with Ansible):&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;as a complete OS image (built with Vagrant / VirtualBox)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;as a docker container&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;as a self contained tar file that can be unpacked and used on any vanilla CentOS machine.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;We eventually settled for the last option. In the remainder of this post, I will describe how it works.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To build the installer tar file, we launch a vanilla CentOS virtual machine (think of it as a golden installer) which we configure with Ansible. Ansible creates the cache folder and then runs a bunch of roles to cache various dependencies. In addition, Ansible fetches the packages to install Apache and the packages to install itself (so the system can be bootstraped). At the end; we are left with a folder,a bunch of scripts and some Ansible playbooks used for deployment. The folder is then archived and zipped using tar. The tar archive can be copied to any plain CentOS node that can then be used as an installer. Building the tar file is fully automated using Jenkins and Ansible.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To make things more concrete, let&amp;#8217;s say you want to deploy the HAProxy load balancer, with this approach, you essentially have to write 2 roles.
+The purpose of the 1st role is to cache all the dependencies that are required to install HAProxy. This role is executed when the installer tar file is built. It looks like this:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;yaml&quot;&gt;&lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;---&lt;/span&gt;
+- name: cache the rpms required to install HAProxy
+  shell: repotrack -p {{ rpms_root }} haproxy&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The variable rpms_root point to a fixed location (i.e. the cache).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;At deployment time, we use a different role that installs HAProxy from the rpms that have been cached.
+The role looks just like what you would write if the node had access to the Internet, except if uses a special purpose yum repository (here called ansible).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;yaml&quot;&gt;&lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;---&lt;/span&gt;
+- name: install HAProxy
+  shell: yum install -y haproxy --disablerepo=* --enablerepo=ansible
+
+- name: customize HAProxy to serve HTTP traffic to the designated downstream servers
+  template: src=haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg owner=haproxy group=haproxy
+  notify: restart_haproxy
+
+- name: ensure HAProxy is started and enabled at boot time
+  service: name=haproxy state=started enabled=yes&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;At deployment time, the installer adds the special ansible yum repository on all the target nodes. The yum repo is derived from a template that looks like this:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;ini&quot;&gt;&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;[ansible]&lt;/span&gt;
+&lt;span style=&quot;color: #7D9029&quot;&gt;name&lt;/span&gt;&lt;span style=&quot;color: #666666&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;Ansible&lt;/span&gt;
+&lt;span style=&quot;color: #7D9029&quot;&gt;baseurl&lt;/span&gt;&lt;span style=&quot;color: #666666&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;http://{{ deployment_node_ip }}/rpms&lt;/span&gt;
+&lt;span style=&quot;color: #7D9029&quot;&gt;enabled&lt;/span&gt;&lt;span style=&quot;color: #666666&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;1&lt;/span&gt;
+&lt;span style=&quot;color: #7D9029&quot;&gt;gpgcheck&lt;/span&gt;&lt;span style=&quot;color: #666666&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;0&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In other words, at deployment time, each node knows where to go to find the RPM to install. deployment_node_ip points to the IP address of the installer node.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I&amp;#8217;ve tested this approach with CentOS nodes, but it should work (with some changes obviously, pick your favourite package manager) on other Linux distributions. I&amp;#8217;ve also tested caching and deploying Windows applications. It works quite well, but extra steps are required to download all the dependencies required to setup WinRM connections.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_pros-and-cons&quot;&gt;Pros and cons&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;An obvious benefit of the installer pattern is that it makes deployments quite a bit faster since everything is pre-cached. If you have to install a large package on a set of nodes (for example, a SolrCloud cluster) then the speedups can be quite substantial. If you have to deploy a full stack (from app to monitoring on multiple nodes), then even more so. From start to finish, our complex stack takes about 7 minutes to deploy and configure. The obvious downside of the approach is that it forces you to split your deployment into 2 stages (cache and install). Testing also requires a bit more rigour as you really need to ensure that your target machines are cut of from the Internet (otherwise you might be testing the wrong thing). For that I use Vagrant to launch clusters using private networks configured with no Internet access.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Most people nowadays are lucky enough to host things in the Cloud or on their own infrastructure. If you are not, and if tightly controlled environments are an issue for you, I am hoping that you&amp;#8217;ve found this post useful.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As always, comments and questions are welcome.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Guillaume.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Fri, 27 Nov 2015 00:00:00 +0200</pubDate>
+        <link>http://kafecho.github.io/ansible/haproxy/devops/2015/11/27/ansible-the-installer-pattern.html</link>
+        <guid isPermaLink="true">http://kafecho.github.io/ansible/haproxy/devops/2015/11/27/ansible-the-installer-pattern.html</guid>
+        
+        
+        <category>Ansible</category>
+        
+        <category>HAProxy</category>
+        
+        <category>DevOps</category>
+        
+      </item>
+    
+      <item>
+        <title>Ansible and Windows</title>
+        <description>&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In this post, we are going to be looking at how to use Ansible to manage Windows systems.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_context&quot;&gt;Context&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I&amp;#8217;ve been tasked to look at various configuration management solutions to setup and manage Windows machine.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As I already use Ansible in quite a few places on Linux, I decided to try the relatively new Windows support (as of 1.7).
+I set myself a fairly simple task, that is installing and configuring CouchDB from scratch.
+I later added the ability to install Microsoft Silverlight.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Setting up the Windows environment was fairly straightforward, I just followed the instructions from the Ansible website and I was able to setup my Windows7 box with WinRM.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ansible has managed to keep the same operating model on both Windows and Linux: it&amp;#8217;s all agent-less, you can invoke ad-hoc commands on both Windows and Linux, and even write Playbooks where some sections take place on Windows while others on Linux.
+The list of Windows specific modules is a bit small (but hopefully growing).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For my particular job, I needed to tweak the CouchDB configuration once it is installed.
+Normally on Linux, I would use the template module, which is not yet available on Windows.
+I eventually settled for a hybrid option, where I apply the template locally on the Linux 'master' node and then I instruct the Windows box to fetch the templated content via http (I run an HTTP server on my Ansible 'master' node).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_the-playbooks&quot;&gt;The playbooks&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Here is what the Playbook looks like.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The steps below run on the Ansible 'master' node.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;YAML&quot;&gt;- hosts: 127.0.0.1
+  sudo: True
+  connection: local
+  vars:
+   &lt;span style=&quot;color: #408080; font-style: italic&quot;&gt;# Some customisations to the CouchDB configuration.&lt;/span&gt;
+   couchdb_port: 5983
+   couchdb_bind_address: 0.0.0.0
+
+  tasks:
+  &lt;span style=&quot;color: #408080; font-style: italic&quot;&gt;# I use a web server to serve content from the master node to the windows machine.&lt;/span&gt;
+  &lt;span style=&quot;color: #408080; font-style: italic&quot;&gt;# This approach also enables offline mode, where the Windows node don&amp;#39;t have access to the internet&lt;/span&gt;
+  - name: install Apache2 on the Ansible master node
+    yum: name=httpd
+
+  - name: create the ansible folder that will be served by Apache2
+    file: path=/var/www/html/ansible state=directory
+
+  - name: retrieve the Windows installer for CouchDB
+    get_url: url=http://apache.is.co.za/couchdb/binary/win/1.6.1/setup-couchdb-1.6.1_R16B02.exe dest=/var/www/html/ansible/couchdb.exe force=no
+
+  - name: add a copy of the Silverlight windows installer to the web server folder
+    copy: src=Silverlight_x64.exe dest=/var/www/html/ansible/Silverlight_x64.exe
+
+  &lt;span style=&quot;color: #408080; font-style: italic&quot;&gt;# Templating is not yet supported in Windows, so we template the file on the master node and serve the output via http&lt;/span&gt;
+  - name: create a CouchDB local.ini file from a template and save it to the local webserver.
+    template: src=local.ini.j2 dest=/var/www/html/ansible/local.ini
+
+  - name: ensure that Apache2 is running
+    service: name=httpd state=started&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The steps below run on any Windows node in the inventory&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;yaml&quot;&gt;- hosts: windows
+  gather_facts: no
+  tasks:
+  &lt;span style=&quot;color: #408080; font-style: italic&quot;&gt;# We discover the ip address of the master node, so that windows nodes can fetch content over Http from the right place&lt;/span&gt;
+  - name: fetch the ip address of the master node
+    local_action: &lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;shell&lt;/span&gt;&lt;span style=&quot;color: #19177C&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;ifconfig&lt;/span&gt;&lt;span style=&quot;color: #19177C&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;eth1&lt;/span&gt;&lt;span style=&quot;color: #19177C&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color: #19177C&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;grep&lt;/span&gt;&lt;span style=&quot;color: #19177C&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;&amp;#39;inet&lt;/span&gt;&lt;span style=&quot;color: #19177C&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;addr&amp;#39;&lt;/span&gt;&lt;span style=&quot;color: #19177C&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color: #19177C&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;awk&lt;/span&gt;&lt;span style=&quot;color: #19177C&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;-F:&lt;/span&gt;&lt;span style=&quot;color: #19177C&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;&amp;#39;{print&lt;/span&gt;&lt;span style=&quot;color: #19177C&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;$2}&amp;#39;&lt;/span&gt;&lt;span style=&quot;color: #19177C&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color: #19177C&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;awk&lt;/span&gt;&lt;span style=&quot;color: #19177C&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;&amp;#39;{print&lt;/span&gt;&lt;span style=&quot;color: #19177C&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;$1}&amp;#39;&amp;quot;&lt;/span&gt;
+    register: ansible_master_ip
+
+  - name: download the Silverlight installer from the Ansible master node
+    win_get_url: url=http://{{ ansible_master_ip.stdout }}/ansible/Silverlight_x64.exe  dest=C:\Users\Guillaume\silverlight.exe
+
+  - name: proceed to a silent install of silverlight
+    script: installsilverlight.ps1
+
+  - name: download the couchdb.exe InnoSetup installer from the Ansible master node
+    win_get_url: url=http://{{ ansible_master_ip.stdout }}/ansible/couchdb.exe  dest=C:\Users\Guillaume\couchdb.exe
+
+  - name: ensure that CouchDB is stopped
+    win_service: name=&amp;quot;Apache CouchDB&amp;quot; state=stopped
+    ignore_errors: true
+
+  - name: stop left-over Erlang processes (otherwise, the installation via PowerShell will fail)
+    script: stoperlang.ps1
+
+  - name: proceed to a silent install of couchdb
+    script: installcouchdb.ps1
+
+  - name: customize the CouchDB configuration
+    win_get_url: url=http://{{ ansible_master_ip.stdout }}/ansible/local.ini dest=&amp;#39;C:\Program Files (x86)\Apache Software Foundation\CouchDB\etc\couchdb\local.ini&amp;#39;
+
+  - name: restart couchdb
+    win_service: name=&amp;quot;Apache CouchDB&amp;quot; state=restarted&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_some-thoughts&quot;&gt;Some thoughts&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I do find the Windows philosophy for installing software a bit unusual (it mostly assumes a GUI and someone clicking on things to proceed), but thankfully, I was able to work out the steps to install things silently.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Overall, I am quite happy with the result. The next version of Ansible (1.9) should have improved Windows support with extra modules for doing file copy and dealing with templates.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Good job to the Ansible team for keeping it very simple.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Wed, 07 Jan 2015 00:00:00 +0200</pubDate>
+        <link>http://kafecho.github.io/ansible/and/windows/2015/01/07/ansible-and-windows.html</link>
+        <guid isPermaLink="true">http://kafecho.github.io/ansible/and/windows/2015/01/07/ansible-and-windows.html</guid>
+        
+        
+        <category>Ansible</category>
+        
+        <category>and</category>
+        
+        <category>Windows</category>
         
       </item>
     
