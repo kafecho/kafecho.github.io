@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+    <title>Head In The Clouds - Guillaume's musings</title>
+    <meta name="description" content="" />
+
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="MobileOptimized" content="320" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <!-- Customisation  -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/main.css" />
+
+</head>
+<body class="home-template">
+
+    <header class="main-header post-head no-cover">
+    <nav class="main-nav  clearfix">
+        <a class="back-button icon-arrow-left" href="/">Home</a>
+        <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+    </nav>
+</header>
+
+<main class="content" role="main">
+
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">Ansible roles</h1>
+            <section class="post-meta">
+                <time class="post-date" datetime="2017-05-27">27 May 2017</time>
+                
+                    on Ansible
+                
+            </section>
+        </header>
+
+<!--         <header class="post-header">
+            <a id="blog-logo" href="http://kafecho.github.io">
+                
+                    <span class="blog-title">Head In The Clouds</span>
+                
+            </a>
+        </header> -->
+
+        <!-- <span class="post-meta">
+            <time datetime="2017-05-27">27 May 2017</time>
+            
+                on Ansible
+            
+        </span> -->
+
+        <!-- <h1 class="post-title">Ansible roles</h1> -->
+
+        <section class="post-content">
+            <div class="paragraph">
+<p>In this post, I am going to talk about some of the Ansible roles that I&#8217;ve built over the years. This post is written from the point of view of a Software Engineer, so think <strong>Dev</strong> Ops.</p>
+</div>
+<div class="sect1">
+<h2 id="_once-upon-a-time">Once upon a time</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>I started working with Ansible back in 2012, the year when it was initially released.
+At the time, I was mostly doing software engineering and I was amazed at how simple Ansible was as I could quickly build configuration management solutions to deploy and manage the software I had written.
+Over the years, I&#8217;ve accumulated written quite a few playbooks and re-usable roles which is what I am going to talk about today.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what-is-a-role">What is a role?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In case you don&#8217;t know what a <a href="http://docs.ansible.com/ansible/playbooks_roles.html">role</a> is, you can think of it as a reusable set of instructions which you can use to manage a particular set of configurations.</p>
+</div>
+<div class="paragraph">
+<p>For example, if you work in Java, Scala or Clojure, you will need a JDK installed to run your software.</p>
+</div>
+<div class="paragraph">
+<p>Sometimes, it is easy, and you just delegate to your OS package manager to do it for you.</p>
+</div>
+<div class="paragraph">
+<p>Sometimes you have to go through a bunch of hoops in order to make it work (as it is the case with the Oracle JDK).</p>
+</div>
+<div class="paragraph">
+<p>Luckily, Ansible lets you easily capture those hoops into a <strong>LEGO-block</strong> style set of instructions which you can apply anywhere you want. This is the essence of a role.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_operating-systems">Operating Systems</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>I can&#8217;t verify this scientifically, but I think the vast majority of Ansible users are using it to setup and manage Linux systems (CentOS, Ubuntu, etc..).</p>
+</div>
+<div class="paragraph">
+<p>There are exceptions of course, with people like <a href="http://hindenes.com/trondsworking/">Trond Hindenese</a> and <a href="https://www.ansible.com/ansible-2-windows">Jon Hawkesworth</a> doing amazing work to promote Ansible on Windows.</p>
+</div>
+<div class="paragraph">
+<p>The vast majority of roles that I&#8217;ve written are for CentOS, although I&#8217;ve also written quite a few Ansible roles as well, and even roles which are OS and OS distribution agnostic.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_stuff-i-ve-done-on-windows">Stuff I&#8217;ve done on Windows</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Here is a non exhaustive list of roles that I&#8217;ve written for Windows</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Oracle JDK: downloads and installs a particular version of the Oracle JDK so I can run JVM-based applications</p>
+</li>
+<li>
+<p>Apache Commons Daemon: so that I can run JVM apps as Windows service</p>
+</li>
+<li>
+<p><a href="https://nssm.cc/">NSSM</a>: another tool for running anything as a Windows service</p>
+</li>
+<li>
+<p>Solr and SolrCloud: combine some of the roles above to run Solr as a Service on Windows</p>
+</li>
+<li>
+<p>MySQL: installs and configure MySQL with a given profile and database settings</p>
+</li>
+<li>
+<p>CouchDB: installs and configure CouchDB instances and setup up databases with replication. This is done with CouchDB 1.6.x</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_stuff-i-ve-done-on-linux">Stuff I&#8217;ve done on Linux</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Here is a non exhaustive list of roles that I&#8217;ve built for Linux</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Oracle JDK, again Oracle does not make life easy, but Ansible does</p>
+</li>
+<li>
+<p>Jenkins</p>
+</li>
+<li>
+<p>Vagrant (for creating VMs on demand)</p>
+</li>
+<li>
+<p>CouchDB, including CouchDB 1.6 and CouchDB 2.x (and some BigCouch)</p>
+</li>
+<li>
+<p>Zookeeper for easily setting up Zookeeper clusters</p>
+</li>
+<li>
+<p>Solr and SolrCloud</p>
+</li>
+<li>
+<p>Elastic Search, Kibana, Logstash</p>
+</li>
+<li>
+<p>InfluxDB and Grafana</p>
+</li>
+<li>
+<p>HAProxy</p>
+</li>
+<li>
+<p><a href="http://www.keepalived.org/">Keepalived</a> as a generic mechanism for providing failover for processes</p>
+</li>
+<li>
+<p>Clusters with <a href="http://clusterlabs.org/doc/">Pacemaker</a>, Corosync and <a href="https://docs.linbit.com/">DRBD</a></p>
+</li>
+<li>
+<p>Monit</p>
+</li>
+<li>
+<p><a href="https://www.icinga.com/products/icinga-2/">Icinga2</a> where Ansible is used throughout from installing the software to configuring hosts, groups, checks and alerts. In one facility this is used to monitor up to <strong>160 machines!!</strong>.</p>
+</li>
+<li>
+<p>Some custom roles to interact with hardware equipement used in television facilities</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_automate-all-the-things">Automate all the things</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The main purpose of the Ansible roles is to <strong>automate as much as possible</strong>.</p>
+</div>
+<div class="paragraph">
+<p>For example, I built a <strong>Continuous Delivery pipeline</strong> pretty much entirely from roles.</p>
+</div>
+<div class="paragraph">
+<p>Ansible is used throughout, from deploying and configuring Jenkins to managing the virtual infrastructure that Jenkins uses for building and testing software.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_complex-made-easy">Complex made easy</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Ansible makes what seems like complicated things <strong>very very easy</strong>.</p>
+</div>
+<div class="paragraph">
+<p>For example, setting up a SolrCloud cluster on 5 machines backed with a Zookeeper ensemble is actually a matter of putting the right LEGO blocks together.
+Setting a resilient load-balanced website is actually easy once you have the right pieces in place (HAProxy, Keepalived).
+And the nice thing is you can use the same pieces to build other kinds of resilient deployments.</p>
+</div>
+<div class="paragraph">
+<p>Some of the roles that I&#8217;ve written have been used in rather complex deployment topologies, for example for <strong>resilience</strong> and <strong>disaster recovery</strong> purposes.
+The nice thing is that the role did not have to change (most of the work went into the design of Ansible inventories), so the same role that can be used on my laptop also works when used in a datacenter environment.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_it-s-all-in-the-code">It&#8217;s all in the code</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Ansible roles keep everything in one place. The code is self explanatory (with the use of comments), so if you want to know how something is deployed, instead of reading documentation or watching a tutorial, just look at the .YAML files and you are good to go.
+I get back to roles that I have written 5 years ago, and the intent is still very clear, because of the documentation, but also because of the declarative YAML syntax.
+It just reads as easy as <strong>written instructions</strong> but with the added benefit of being <strong>executable instructions</strong>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_parting-words">Parting words</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>I hope that you&#8217;ve enjoyed this post, please get in touch with me (kafecho at gmail dot com) if you want to find out more, or need help with your deployments.</p>
+</div>
+</div>
+</div>
+        </section>
+
+        
+
+        <footer class="post-footer">
+            <!-- If we want to display author's name and bio -->
+            
+                <figure class="author-image">
+                    <a class="img" href="/" style="background-image: url(/assets/images/profile.jpg)">
+                    <span class="hidden">Guillaume Belrose's Picture</span></a>
+                </figure>
+                <section class="author">
+                    <!-- Author Name -->
+                    <h4> Guillaume Belrose </h4>
+                    <!-- Author Bio -->
+                    <p>
+                        Call me "G" and follow me on Twitter <a href="http://www.twitter.com/gbelrose">@gbelrose</a>
+                    </p>
+                </section>
+            
+
+            <!-- Share links section -->
+            <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?text=Ansible roles&amp;url=http://kafecho.github.io/ansible/2017/05/27/ansible-roles.html"
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://kafecho.github.io/ansible/2017/05/27/ansible-roles.html"
+        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://kafecho.github.io/ansible/2017/05/27/ansible-roles.html"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+            
+  <div id="disqus_thread"></div>
+  <script>
+  /**
+  * RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+  * LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+  */
+  var disqus_config = function () {
+    this.page.url = "http://kafecho.github.io/ansible/2017/05/27/ansible-roles.html"; // Replace PAGE_URL with your page's canonical URL variable
+  this.page.identifier = "kafecho.github.io/ansible/2017/05/27/ansible-roles.html"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+  };
+  (function() { // DON'T EDIT BELOW THIS LINE
+  var d = document, s = d.createElement('script');
+
+  s.src = '//head-in-the-clouds.disqus.com/embed.js';
+
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+  })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+        </footer>
+
+    </article>
+
+</main>
+
+    <footer class="site-footer clearfix">
+      <section class="copyright">
+        <a href="/">Head In The Clouds</a> &copy; 2017 &bull; All rights reserved.
+      </section>
+      <section class="poweredby">Made with Jekyll using <a href="http://github.com/rosario/kasper">Kasper theme</a>
+      </section>
+    </footer>
+
+    <script type="text/javascript" src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+
+    <!-- Google Analytics Tracking code -->
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-XXXXXXXX-X']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+</body>
+</html>
