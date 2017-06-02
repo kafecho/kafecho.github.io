@@ -3,10 +3,10 @@
   <channel>
     <title></title>
     <description>Guillaume's musings</description>
-    <link>http://kafecho.github.io/</link>
-    <atom:link href="http://kafecho.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 27 May 2017 12:12:51 +0200</pubDate>
-    <lastBuildDate>Sat, 27 May 2017 12:12:51 +0200</lastBuildDate>
+    <link>http://www.soundcode.co.za/</link>
+    <atom:link href="http://www.soundcode.co.za/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Fri, 02 Jun 2017 12:39:19 +0200</pubDate>
+    <lastBuildDate>Fri, 02 Jun 2017 12:39:19 +0200</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
     
       <item>
@@ -192,8 +192,8 @@ It just reads as easy as &lt;strong&gt;written instructions&lt;/strong&gt; but w
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Sat, 27 May 2017 00:00:00 +0200</pubDate>
-        <link>http://kafecho.github.io/ansible/2017/05/27/ansible-roles.html</link>
-        <guid isPermaLink="true">http://kafecho.github.io/ansible/2017/05/27/ansible-roles.html</guid>
+        <link>http://www.soundcode.co.za/ansible/2017/05/27/ansible-roles.html</link>
+        <guid isPermaLink="true">http://www.soundcode.co.za/ansible/2017/05/27/ansible-roles.html</guid>
         
         
         <category>Ansible</category>
@@ -293,8 +293,8 @@ Relying on Elm to handle the state and events and Vanilla JS to be a pure render
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Sat, 13 May 2017 00:00:00 +0200</pubDate>
-        <link>http://kafecho.github.io/elm/2017/05/13/introduction-to-elm.html</link>
-        <guid isPermaLink="true">http://kafecho.github.io/elm/2017/05/13/introduction-to-elm.html</guid>
+        <link>http://www.soundcode.co.za/elm/2017/05/13/introduction-to-elm.html</link>
+        <guid isPermaLink="true">http://www.soundcode.co.za/elm/2017/05/13/introduction-to-elm.html</guid>
         
         
         <category>Elm</category>
@@ -309,11 +309,11 @@ Relying on Elm to handle the state and events and Vanilla JS to be a pure render
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;The 2017 edition definitely has a strong &lt;strong&gt;Functional Programming&lt;/strong&gt; flavour :-)
 The slides are very high level and cover a tiny spectrum of the language.
-There are here: &lt;a href=&quot;http://kafecho.github.io/assets/presentations/scala-in-15-minutes-jozi-jug-30-01-2017.pdf&quot; class=&quot;bare&quot;&gt;http://kafecho.github.io/assets/presentations/scala-in-15-minutes-jozi-jug-30-01-2017.pdf&lt;/a&gt;&lt;/p&gt;
+There are here: &lt;a href=&quot;http://www.soundcode.co.za/assets/presentations/scala-in-15-minutes-jozi-jug-30-01-2017.pdf&quot; class=&quot;bare&quot;&gt;http://www.soundcode.co.za/assets/presentations/scala-in-15-minutes-jozi-jug-30-01-2017.pdf&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 30 Jan 2017 00:00:00 +0200</pubDate>
-        <link>http://kafecho.github.io/scala/java/jug/2017/01/30/scala-lightning-talk.html</link>
-        <guid isPermaLink="true">http://kafecho.github.io/scala/java/jug/2017/01/30/scala-lightning-talk.html</guid>
+        <link>http://www.soundcode.co.za/scala/java/jug/2017/01/30/scala-lightning-talk.html</link>
+        <guid isPermaLink="true">http://www.soundcode.co.za/scala/java/jug/2017/01/30/scala-lightning-talk.html</guid>
         
         
         <category>Scala</category>
@@ -522,8 +522,8 @@ They start reproducing &lt;strong&gt;ad infinitum&lt;/strong&gt; according to so
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 08 Dec 2016 00:00:00 +0200</pubDate>
-        <link>http://kafecho.github.io/elm/javascript/functionalprogramming/fibonacci/2016/12/08/the-batmanacci-sequence.html</link>
-        <guid isPermaLink="true">http://kafecho.github.io/elm/javascript/functionalprogramming/fibonacci/2016/12/08/the-batmanacci-sequence.html</guid>
+        <link>http://www.soundcode.co.za/elm/javascript/functionalprogramming/fibonacci/2016/12/08/the-batmanacci-sequence.html</link>
+        <guid isPermaLink="true">http://www.soundcode.co.za/elm/javascript/functionalprogramming/fibonacci/2016/12/08/the-batmanacci-sequence.html</guid>
         
         
         <category>Elm</category>
@@ -645,8 +645,8 @@ They start reproducing &lt;strong&gt;ad infinitum&lt;/strong&gt; according to so
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 17 Nov 2016 00:00:00 +0200</pubDate>
-        <link>http://kafecho.github.io/ansible/devops/2016/11/17/ad-hoc-ansible-role.html</link>
-        <guid isPermaLink="true">http://kafecho.github.io/ansible/devops/2016/11/17/ad-hoc-ansible-role.html</guid>
+        <link>http://www.soundcode.co.za/ansible/devops/2016/11/17/ad-hoc-ansible-role.html</link>
+        <guid isPermaLink="true">http://www.soundcode.co.za/ansible/devops/2016/11/17/ad-hoc-ansible-role.html</guid>
         
         
         <category>Ansible</category>
@@ -1031,8 +1031,8 @@ It aims at being as pure as possible so the way you handle side effects (like ke
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 08 Nov 2016 00:00:00 +0200</pubDate>
-        <link>http://kafecho.github.io/elm/javascript/functionalprogramming/2016/11/08/learning-elm.html</link>
-        <guid isPermaLink="true">http://kafecho.github.io/elm/javascript/functionalprogramming/2016/11/08/learning-elm.html</guid>
+        <link>http://www.soundcode.co.za/elm/javascript/functionalprogramming/2016/11/08/learning-elm.html</link>
+        <guid isPermaLink="true">http://www.soundcode.co.za/elm/javascript/functionalprogramming/2016/11/08/learning-elm.html</guid>
         
         
         <category>Elm</category>
@@ -1103,8 +1103,8 @@ It aims at being as pure as possible so the way you handle side effects (like ke
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 08 Nov 2016 00:00:00 +0200</pubDate>
-        <link>http://kafecho.github.io/hello/2016/11/08/hello-world.html</link>
-        <guid isPermaLink="true">http://kafecho.github.io/hello/2016/11/08/hello-world.html</guid>
+        <link>http://www.soundcode.co.za/hello/2016/11/08/hello-world.html</link>
+        <guid isPermaLink="true">http://www.soundcode.co.za/hello/2016/11/08/hello-world.html</guid>
         
         
         <category>Hello</category>
@@ -1197,8 +1197,8 @@ Have a look at &lt;a href=&quot;https://github.com/kafecho/ansible-couchdb2&quot
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Sun, 31 Jan 2016 00:00:00 +0200</pubDate>
-        <link>http://kafecho.github.io/couchdb/gatling/scala/akka/2016/01/31/how-to-stress-test-couchdb-with-gatling.html</link>
-        <guid isPermaLink="true">http://kafecho.github.io/couchdb/gatling/scala/akka/2016/01/31/how-to-stress-test-couchdb-with-gatling.html</guid>
+        <link>http://www.soundcode.co.za/couchdb/gatling/scala/akka/2016/01/31/how-to-stress-test-couchdb-with-gatling.html</link>
+        <guid isPermaLink="true">http://www.soundcode.co.za/couchdb/gatling/scala/akka/2016/01/31/how-to-stress-test-couchdb-with-gatling.html</guid>
         
         
         <category>CouchDB</category>
@@ -1328,8 +1328,8 @@ The role looks just like what you would write if the node had access to the Inte
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Fri, 27 Nov 2015 00:00:00 +0200</pubDate>
-        <link>http://kafecho.github.io/ansible/haproxy/devops/2015/11/27/ansible-the-installer-pattern.html</link>
-        <guid isPermaLink="true">http://kafecho.github.io/ansible/haproxy/devops/2015/11/27/ansible-the-installer-pattern.html</guid>
+        <link>http://www.soundcode.co.za/ansible/haproxy/devops/2015/11/27/ansible-the-installer-pattern.html</link>
+        <guid isPermaLink="true">http://www.soundcode.co.za/ansible/haproxy/devops/2015/11/27/ansible-the-installer-pattern.html</guid>
         
         
         <category>Ansible</category>
@@ -1472,8 +1472,8 @@ I eventually settled for a hybrid option, where I apply the template locally on 
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Wed, 07 Jan 2015 00:00:00 +0200</pubDate>
-        <link>http://kafecho.github.io/ansible/windows/2015/01/07/ansible-and-windows.html</link>
-        <guid isPermaLink="true">http://kafecho.github.io/ansible/windows/2015/01/07/ansible-and-windows.html</guid>
+        <link>http://www.soundcode.co.za/ansible/windows/2015/01/07/ansible-and-windows.html</link>
+        <guid isPermaLink="true">http://www.soundcode.co.za/ansible/windows/2015/01/07/ansible-and-windows.html</guid>
         
         
         <category>Ansible</category>
