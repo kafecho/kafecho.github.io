@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+    <title>Sound / Code - Guillaume's musings</title>
+    <meta name="description" content="" />
+
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="MobileOptimized" content="320" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <!-- Customisation  -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/main.css" />
+
+</head>
+<body class="home-template">
+
+    <header class="main-header post-head no-cover">
+    <nav class="main-nav  clearfix">
+        <a class="back-button icon-arrow-left" href="/">Home</a>
+        <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+    </nav>
+</header>
+
+<main class="content" role="main">
+
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">Simple visuals with the Web Audio API</h1>
+            <section class="post-meta">
+                <time class="post-date" datetime="2017-06-16">16 Jun 2017</time>
+                
+                    on JavaScript
+                
+            </section>
+        </header>
+
+<!--         <header class="post-header">
+            <a id="blog-logo" href="http://www.soundcode.co.za">
+                
+                    <span class="blog-title">Sound / Code</span>
+                
+            </a>
+        </header> -->
+
+        <!-- <span class="post-meta">
+            <time datetime="2017-06-16">16 Jun 2017</time>
+            
+                on JavaScript
+            
+        </span> -->
+
+        <!-- <h1 class="post-title">Simple visuals with the Web Audio API</h1> -->
+
+        <section class="post-content">
+            <div class="paragraph">
+<p>In this post, we are going to be looking at some cool stuff that you can do with the Web Audio API.</p>
+</div>
+<div class="sect1">
+<h2 id="_context">Context</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As a inspiring musician, I like all things related to sound.
+I don&#8217;t do an amazing amount of JavaScript on a regular basis, but the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API">Web Audio API</a> is one of my favourites browser APIs ever.</p>
+</div>
+<div class="paragraph">
+<p>It gives you elegant (and clock-accurate) APIs for <strong>creating</strong>, <strong>playing</strong> and <strong>analysing</strong> sounds.
+You can use it to play audio samples with very high precision, create music from elemental waves, and even do very cheap Fast Fourier Transforms.
+In this post, we are going to see how to build a simple volume meter using the Web Audio API and some HTML5 canvas objects.</p>
+</div>
+<div class="paragraph">
+<p>For some more background information see:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://chimera.labs.oreilly.com/books/1234000001552/ch03.html" class="bare">http://chimera.labs.oreilly.com/books/1234000001552/ch03.html</a></p>
+</li>
+<li>
+<p><a href="http://www.smartjava.org/content/exploring-html5-web-audio-visualizing-sound" class="bare">http://www.smartjava.org/content/exploring-html5-web-audio-visualizing-sound</a></p>
+</li>
+<li>
+<p>and for some really awesome demos, go to <a href="http://webaudiodemos.appspot.com/" class="bare">http://webaudiodemos.appspot.com/</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_approaches">Approaches</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In order to analyse the volume of a video clip, we essentially need to get hold of the audio samples (the waveform) at a given point in time.
+We can then look at the peak value of the amplitude function. If the absolute value of the amplitude is too high, then the sound is likely to end up being distorted, which is what we want to avoid.</p>
+</div>
+<div class="paragraph">
+<p>The Web Audio API allows you to build an audio processing chain from a variety of sources, including HTML5 players.</p>
+</div>
+<div class="paragraph">
+<p>The Web Audio API provides 2 mechanisms for finding the waveform:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>use a ScriptProcessorNode <a href="https://developer.mozilla.org/en-US/docs/Web/API/ScriptProcessorNode" class="bare">https://developer.mozilla.org/en-US/docs/Web/API/ScriptProcessorNode</a></p>
+</li>
+<li>
+<p>use an AnalyserNode <a href="https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode" class="bare">https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode</a> that is based on a fast Fourier transform (FFT) with a given sample size.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>I&#8217;ve decided to use an AnalyserNode for the various reasons:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>the ScriptProcessorNode has a deprecation warning</p>
+</li>
+<li>
+<p>it slows things down as it runs all the time (whenever there is audio available to be processed)</p>
+</li>
+<li>
+<p>it is hard to chain with other nodes.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The AnalyserNode is a lot more user friendly, but has to be ran on demand, so basically the recommendation is to run it within a <strong>requestAnimationFrame</strong> cycle.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_using-the-analyser-node">Using the Analyser node</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Given an audio source, an analyser node would mix all available channels prior to analysis, so in order to preserve the information relevant to the various channels, we have to use a channel splitter.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="javascript"><span style="color: #008000; font-weight: bold">var</span> audioContext  <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> (<span style="color: #008000">window</span>.AudioContext);
+<span style="color: #008000; font-weight: bold">var</span> videoPlayer   <span style="color: #666666">=</span> <span style="color: #008000">document</span>.getElementById(<span style="color: #BA2121">&quot;video&quot;</span>);
+<span style="color: #008000; font-weight: bold">var</span> source        <span style="color: #666666">=</span> audioContext.createMediaElementSource(videoPlayer);
+<span style="color: #008000; font-weight: bold">var</span> splitter      <span style="color: #666666">=</span> audioContext.createChannelSplitter(<span style="color: #666666">2</span>);
+
+source.connect(splitter);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the code above, we create an audio source from an HTML5 video player and split the channel into left and right.</p>
+</div>
+<div class="paragraph">
+<p>For test purposes (for example to trigger a distortion), I pipe the left and right channels to amplifier nodes (gain nodes).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="javascript"><span style="color: #008000; font-weight: bold">var</span> leftChannelGain    <span style="color: #666666">=</span> audioContext.createGain();
+<span style="color: #008000; font-weight: bold">var</span> rightChannelGain   <span style="color: #666666">=</span> audioContext.createGain();
+
+leftChannelGain.gain.value <span style="color: #666666">=</span> <span style="color: #666666">1</span>;
+rightChannelGain.gain.value <span style="color: #666666">=</span> <span style="color: #666666">1</span>;
+
+splitter.connect(leftChannelGain, <span style="color: #666666">0</span>);
+splitter.connect(rightChannelGain, <span style="color: #666666">1</span>);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the example above, the gain is set to 1 (i.e. volume unchanged, but setting it to a higher value will cause distortions.)</p>
+</div>
+<div class="paragraph">
+<p>The next step is to create analyser nodes for the left and right channels.
+Each analyser is connected to its source to a gain node. The output of each analyser is merged back to the destination so it can be played back via the output device.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="javascript"><span style="color: #008000; font-weight: bold">var</span> leftChannelAnalyser <span style="color: #666666">=</span> audioContext.createAnalyser();
+leftChannelAnalyser.fftSize <span style="color: #666666">=</span> fftSize;
+<span style="color: #008000; font-weight: bold">var</span> leftChannelTimeData <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> Float32Array(leftChannelAnalyser.fftSize);
+
+<span style="color: #008000; font-weight: bold">var</span> rightChannelAnalyser <span style="color: #666666">=</span> audioContext.createAnalyser();
+rightChannelAnalyser.fftSize <span style="color: #666666">=</span> fftSize;
+<span style="color: #008000; font-weight: bold">var</span> rightChannelTimeData <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> Float32Array(rightChannelAnalyser.fftSize);
+
+leftChannelGain.connect (leftChannelAnalyser);
+rightChannelGain.connect (rightChannelAnalyser);
+
+<span style="color: #008000; font-weight: bold">var</span> merger      <span style="color: #666666">=</span> audioContext.createChannelMerger(<span style="color: #666666">2</span>);
+
+leftChannelAnalyser.connect(merger, <span style="color: #666666">0</span>, <span style="color: #666666">0</span>);
+rightChannelAnalyser.connect(merger, <span style="color: #666666">0</span>, <span style="color: #666666">1</span>);
+
+merger.connect(audioContext.destination);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The Web Audio API graph is very flexible, so the various nodes can be wired differently.
+I just chose this structure because, well  <strong>¯_(ツ)_/¯</strong></p>
+</div>
+<div class="paragraph">
+<p>At each analysis, the time-domain waveform is available as a Float32Array whose values are normally between [-1, 1] (this is a mapping of a 32bit), where the (absolute) value of 1 is considered as an acceptable limit.
+If the gain on a channel is too high, the number can be higher than 1, in this case, a distortion is likely to occur.</p>
+</div>
+<div class="paragraph">
+<p>The [-1, 1] range is actually a mapping to the range expressed with <a href="https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/minDecibels" class="bare">https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/minDecibels</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/maxDecibels" class="bare">https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/maxDecibels</a>.</p>
+</div>
+<div class="paragraph">
+<p>Note that those decibel values <strong>don&#8217;t correspond</strong> to the gain (as in the amplification factor). Basically they refer to the dBFS (decibel full scale, as described in more details in <a href="http://chimera.labs.oreilly.com/books/1234000001552/ch03.html" class="bare">http://chimera.labs.oreilly.com/books/1234000001552/ch03.html</a>).</p>
+</div>
+<div class="paragraph">
+<p>In a digital VU meter, the maximum volume is set at 0db, anything beyond down will result in audio clipping. See this for more information: <a href="https://documentation.apple.com/en/finalcutpro/usermanual/index.html#chapter=54%26section=1%26tasks=true" class="bare">https://documentation.apple.com/en/finalcutpro/usermanual/index.html#chapter=54%26section=1%26tasks=true</a></p>
+</div>
+<div class="paragraph">
+<p>We can use a simple function to find the peak "volume" for a given array.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="javascript"><span style="color: #008000; font-weight: bold">var</span> findPeak <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">function</span>(array){
+    <span style="color: #008000; font-weight: bold">var</span> peak <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+    array.forEach(<span style="color: #008000; font-weight: bold">function</span>(value){
+        peak <span style="color: #666666">=</span> <span style="color: #008000">Math</span>.max( peak, <span style="color: #008000">Math</span>.abs(value));
+    });
+    <span style="color: #008000; font-weight: bold">return</span> peak;
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In order to graph the peak volume, we use 2 canvas elements (1 per channel) that uses gradient between shades of green, orange and red (where red indicates likely audio clipping).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="javascript"><span style="color: #008000; font-weight: bold">var</span> leftPeakMeterCanvas <span style="color: #666666">=</span> <span style="color: #008000">document</span>.getElementById(<span style="color: #BA2121">&quot;left-peak-meter&quot;</span>);
+<span style="color: #008000; font-weight: bold">var</span> leftPeakMeterContext <span style="color: #666666">=</span> leftPeakMeterCanvas.getContext(<span style="color: #BA2121">&quot;2d&quot;</span>);
+<span style="color: #008000; font-weight: bold">var</span> leftPeakMeterGradient <span style="color: #666666">=</span> leftPeakMeterContext.createLinearGradient(<span style="color: #666666">0</span>, <span style="color: #666666">0</span>, <span style="color: #666666">200</span>, <span style="color: #666666">0</span>);
+leftPeakMeterGradient.addColorStop(<span style="color: #666666">0.5</span>, <span style="color: #BA2121">&quot;green&quot;</span>);
+leftPeakMeterGradient.addColorStop(<span style="color: #666666">0.8</span>, <span style="color: #BA2121">&quot;orange&quot;</span>);
+leftPeakMeterGradient.addColorStop(<span style="color: #666666">1</span>, <span style="color: #BA2121">&quot;red&quot;</span>);
+leftPeakMeterContext.fillStyle <span style="color: #666666">=</span> leftPeakMeterGradient;
+
+<span style="color: #008000; font-weight: bold">var</span> rightPeakMeterCanvas <span style="color: #666666">=</span> <span style="color: #008000">document</span>.getElementById(<span style="color: #BA2121">&quot;right-peak-meter&quot;</span>);
+<span style="color: #008000; font-weight: bold">var</span> rightPeakMeterContext <span style="color: #666666">=</span> rightPeakMeterCanvas.getContext(<span style="color: #BA2121">&quot;2d&quot;</span>);
+<span style="color: #008000; font-weight: bold">var</span> rightPeakMeterGradient <span style="color: #666666">=</span> rightPeakMeterContext.createLinearGradient(<span style="color: #666666">0</span>, <span style="color: #666666">0</span>, <span style="color: #666666">200</span>, <span style="color: #666666">0</span>);
+rightPeakMeterGradient.addColorStop(<span style="color: #666666">0.5</span>, <span style="color: #BA2121">&quot;green&quot;</span>);
+rightPeakMeterGradient.addColorStop(<span style="color: #666666">0.8</span>, <span style="color: #BA2121">&quot;orange&quot;</span>);
+rightPeakMeterGradient.addColorStop(<span style="color: #666666">1</span>, <span style="color: #BA2121">&quot;red&quot;</span>);
+rightPeakMeterContext.fillStyle <span style="color: #666666">=</span> rightPeakMeterGradient;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The last stage is to compute the analysis on a regular basis, get the time domain data, find the peak volume, graph it and report when it goes over a certain limit.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="javascript"><span style="color: #008000; font-weight: bold">function</span> analyse(){
+    leftChannelAnalyser.getFloatTimeDomainData(leftChannelTimeData);
+    rightChannelAnalyser.getFloatTimeDomainData(rightChannelTimeData);
+
+    <span style="color: #008000; font-weight: bold">var</span> leftChannelPeak <span style="color: #666666">=</span> findPeak(leftChannelTimeData);
+    <span style="color: #008000; font-weight: bold">var</span> rightChannelPeak <span style="color: #666666">=</span> findPeak(rightChannelTimeData);
+
+    leftPeakMeterContext.clearRect(<span style="color: #666666">0</span>, <span style="color: #666666">0</span>, leftPeakMeterCanvas.width, leftPeakMeterCanvas.height);
+    leftPeakMeterContext.fillRect(<span style="color: #666666">0</span>, <span style="color: #666666">0</span>, <span style="color: #008000">Math</span>.min(leftPeakMeterCanvas.width, leftChannelPeak <span style="color: #666666">*</span> <span style="color: #666666">200</span>), leftPeakMeterCanvas.height);
+
+    rightPeakMeterContext.clearRect(<span style="color: #666666">0</span>, <span style="color: #666666">0</span>, rightPeakMeterCanvas.width, rightPeakMeterCanvas.height);
+    rightPeakMeterContext.fillRect(<span style="color: #666666">0</span>, <span style="color: #666666">0</span>, <span style="color: #008000">Math</span>.min(rightPeakMeterCanvas.width, rightChannelPeak <span style="color: #666666">*</span> <span style="color: #666666">200</span>), rightPeakMeterCanvas.height);
+
+    <span style="color: #008000; font-weight: bold">if</span> (leftChannelPeak <span style="color: #666666">&gt;=1</span>){
+        console.log(<span style="color: #BA2121">&quot;Left channel is too loud&quot;</span>, leftChannelPeak);
+    }
+
+    <span style="color: #008000; font-weight: bold">if</span> (rightChannelPeak <span style="color: #666666">&gt;=</span> <span style="color: #666666">1</span>){
+        console.log(<span style="color: #BA2121">&quot;Right channel is too loud&quot;</span>, rightChannelPeak);
+    }
+
+    requestAnimationFrame( analyse );
+}
+analyse();
+};</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_et-voila">Et voila.</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>That is it, the code is super simple!!!</p>
+</div>
+<div class="paragraph">
+<p>Using an Analyser Node, you can also extract frequency domain information. So if you want to display a frequency spectrum or any other visuals, that is very simple to do.
+Just get hold of the waveform data, plot stuff on canvases (or using WebGL) and off you go.</p>
+</div>
+</div>
+</div>
+        </section>
+
+        
+
+        <footer class="post-footer">
+            <!-- If we want to display author's name and bio -->
+            
+                <figure class="author-image">
+                    <a class="img" href="/" style="background-image: url(/assets/images/profile.jpg)">
+                    <span class="hidden">Guillaume Belrose's Picture</span></a>
+                </figure>
+                <section class="author">
+                    <!-- Author Name -->
+                    <h4> Guillaume Belrose </h4>
+                    <!-- Author Bio -->
+                    <p>
+                        Call me "G" and follow me on Twitter <a href="http://www.twitter.com/gbelrose">@gbelrose</a>
+                    </p>
+                </section>
+            
+
+            <!-- Share links section -->
+            <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?text=Simple visuals with the Web Audio API&amp;url=http://www.soundcode.co.za/javascript/2017/06/16/visuals-with-the-web-audio-api.html"
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://www.soundcode.co.za/javascript/2017/06/16/visuals-with-the-web-audio-api.html"
+        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://www.soundcode.co.za/javascript/2017/06/16/visuals-with-the-web-audio-api.html"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+            
+  <div id="disqus_thread"></div>
+  <script>
+  /**
+  * RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+  * LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+  */
+  var disqus_config = function () {
+    this.page.url = "http://www.soundcode.co.za/javascript/2017/06/16/visuals-with-the-web-audio-api.html"; // Replace PAGE_URL with your page's canonical URL variable
+  this.page.identifier = "www.soundcode.co.za/javascript/2017/06/16/visuals-with-the-web-audio-api.html"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+  };
+  (function() { // DON'T EDIT BELOW THIS LINE
+  var d = document, s = d.createElement('script');
+
+  s.src = '//www-soundcode-co-za.disqus.com/embed.js';
+
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+  })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+        </footer>
+
+    </article>
+
+</main>
+
+    <footer class="site-footer clearfix">
+      <section class="copyright">
+        <a href="/">Sound / Code</a> &copy; 2017 &bull; All rights reserved.
+      </section>
+      <section class="poweredby">Made with Jekyll using <a href="http://github.com/rosario/kasper">Kasper theme</a>
+      </section>
+    </footer>
+
+    <script type="text/javascript" src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+
+    <!-- Google Analytics Tracking code -->
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-XXXXXXXX-X']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+</body>
+</html>
