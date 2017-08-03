@@ -5,9 +5,235 @@
     <description>Guillaume's musings</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 28 Jul 2017 09:04:57 +0200</pubDate>
-    <lastBuildDate>Fri, 28 Jul 2017 09:04:57 +0200</lastBuildDate>
+    <pubDate>Thu, 03 Aug 2017 16:00:13 +0200</pubDate>
+    <lastBuildDate>Thu, 03 Aug 2017 16:00:13 +0200</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
+    
+      <item>
+        <title>A simple drum machine with Elm and the Web Audio API</title>
+        <description>&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In this post, I am going to talk about how I built &lt;a href=&quot;http://www.soundcode.co.za/elm-beats-demo/&quot;&gt;Elm Beats&lt;/a&gt;, a simple drum machine written in Elm with the Web Audio API.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_context&quot;&gt;Context&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;A while ago, I came across this very interesting Web Application from Ableton (see &lt;a href=&quot;https://learningmusic.ableton.com/&quot; class=&quot;bare&quot;&gt;https://learningmusic.ableton.com/&lt;/a&gt;).
+The app uses the Web Audio API to explain what sounds is, and the various approaches you can use to create music.
+What is even cooler is that the front-end for this web app uses a lot of &lt;a href=&quot;https://www.reddit.com/r/elm/comments/69z2aa/learning_music_from_ableton_frontend_built_with/&quot;&gt;Elm code&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;However, if you poke into the page source code (as I did), you will see that it mostly uses a bunch of JS libraries for the audio sequencing and event handling.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;While there is nothing wrong with that, as an experiment, I wanted to see how far I could get writing a simple audio app where I use:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Elm as much as possible&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;JavaScript as little as possible&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I eventually settled on building a drum machine, very similar in look and feel to the &lt;a href=&quot;https://www.reddit.com/r/elm/comments/69z2aa/learning_music_from_ableton_frontend_built_with/&quot;&gt;Ableton&amp;#8217;s version&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_the-code&quot;&gt;The Code&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The code for the app in on Github: &lt;a href=&quot;https://github.com/kafecho/elm-beats&quot; class=&quot;bare&quot;&gt;https://github.com/kafecho/elm-beats&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_approach&quot;&gt;Approach&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In order to build the drum machine, I need to be able to play drum samples with as much precision as possible. This can be done with the Web Audio API which provides all the necessary mechanism for:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;decoding samples files (in .mp3 or .wav format)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;scheduling playback at very precise time in the future&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;When the Elm app starts, it tells JavaScript (via a port) to decode a bunch of samples stored as .wav file. In JavaScript land, those samples end up as Audio Buffers which are ready for playback.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The port code looks like:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;Elm&quot;&gt;port loadSample : ( SampleAlias, SampleUrl ) -&amp;gt; Cmd msg&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;where: &lt;strong&gt;SampleAlias&lt;/strong&gt; is a String to identify the sample, e.g. Kick and &lt;strong&gt;SampleUrl&lt;/strong&gt; is a String which identifies the URL of the sample on the server.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The corresponding JavaScript code is not complicated&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;JavaScript&quot;&gt;app.ports.loadSample.subscribe(&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;function&lt;/span&gt; ( array ){
+  &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;var&lt;/span&gt; key &lt;span style=&quot;color: #666666&quot;&gt;=&lt;/span&gt; array[&lt;span style=&quot;color: #666666&quot;&gt;0&lt;/span&gt;];
+  &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;var&lt;/span&gt; url &lt;span style=&quot;color: #666666&quot;&gt;=&lt;/span&gt; array[&lt;span style=&quot;color: #666666&quot;&gt;1&lt;/span&gt;];
+
+  &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;if&lt;/span&gt; (samples[key] &lt;span style=&quot;color: #666666&quot;&gt;==&lt;/span&gt; &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;null&lt;/span&gt;){
+    &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;var&lt;/span&gt; request &lt;span style=&quot;color: #666666&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;new&lt;/span&gt; XMLHttpRequest();
+    request.open(&lt;span style=&quot;color: #BA2121&quot;&gt;&amp;#39;GET&amp;#39;&lt;/span&gt;, url, &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;true&lt;/span&gt;);
+    request.responseType &lt;span style=&quot;color: #666666&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #BA2121&quot;&gt;&amp;#39;arraybuffer&amp;#39;&lt;/span&gt;;
+    request.onload &lt;span style=&quot;color: #666666&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;function&lt;/span&gt; () {
+        &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;if&lt;/span&gt; (request.status &lt;span style=&quot;color: #666666&quot;&gt;===&lt;/span&gt; &lt;span style=&quot;color: #666666&quot;&gt;200&lt;/span&gt;) {
+            &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;var&lt;/span&gt; audioData &lt;span style=&quot;color: #666666&quot;&gt;=&lt;/span&gt; request.response;
+            audioContext.decodeAudioData(audioData,
+                &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;function&lt;/span&gt; (audioBuffer){
+                    samples[key]&lt;span style=&quot;color: #666666&quot;&gt;=&lt;/span&gt;audioBuffer;
+                    console.log(&lt;span style=&quot;color: #BA2121&quot;&gt;&amp;quot;Loaded&amp;quot;&lt;/span&gt;, key, url);
+                },
+                &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;function&lt;/span&gt; (e){
+                    notifySampleLoadingFailed(url);
+                });
+        }&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;else&lt;/span&gt; {
+            notifySampleLoadingFailed(url);
+        }
+    }
+
+    request.onerror &lt;span style=&quot;color: #666666&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;function&lt;/span&gt; () {
+        notifySampleLoadingFailed(url);
+    }
+
+    request.send();
+  }
+});&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In a nutshell, the Elm code runs an infinite loop where it does the following:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;It finds out (via a port subscription) what is the current value of the audio clock. This is happening many times per second (tied to the requestAnimationFrame cycle)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Once I know what the clock is at, I can work out if I have to schedule the playback of 1 or more samples in the near future&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;I then use an outgoing port to schedule the sample playback at a very precise point in time.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The JavaScript ports are very simple (see &lt;a href=&quot;https://github.com/kafecho/elm-beats/blob/master/src/index.js&quot; class=&quot;bare&quot;&gt;https://github.com/kafecho/elm-beats/blob/master/src/index.js&lt;/a&gt;) and there is very little code. Most of the heavy lifting (sequencing, display, events) is 100% done in Elm.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_other-features&quot;&gt;Other features&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The app allows you to:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Play / pause at anytime&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Clear the entire performance&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Mute / un-mute a given track&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Clear a given track&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Share your creation via URL (with a hashtag which contains an encoding of the performance)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_observations&quot;&gt;Observations&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Even though the JavaScript codebase is tiny, it is the &lt;strong&gt;only place&lt;/strong&gt; where I got JavaScript runtime errors :-)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;While refactoring the code, I got plenty of compile-time errors in Elm, but the compiler was quite efficient at guiding my choices. Once the Elm code compiles, it is likely that is going to work.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Elm&amp;#8217;s virtual DOM functions were really useful for creating the UI. The UI is basically a grid (an HTML table) where each cell controls a given semiquaver of a given instrument (the user can press on the cell to toggle the playback for that given note).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So I have a function &lt;code&gt;createCell&lt;/code&gt; which creates an HTML &lt;strong&gt;td&lt;/strong&gt; element for a given note. That &lt;strong&gt;td&lt;/strong&gt; component does the necessary event handling and is styled accordingly.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I can &lt;code&gt;map&lt;/code&gt; this function over a list of notes to give me the row for a given instrument.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Via another &lt;code&gt;map&lt;/code&gt; I repeat the same loop for all the instruments until I end up with a grid. Super simple function application.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_many-thanks&quot;&gt;Many thanks&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Many thanks to&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;To Ableton for putting together the impressive work at &lt;a href=&quot;https://learningmusic.ableton.com&quot; class=&quot;bare&quot;&gt;https://learningmusic.ableton.com&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;To @halfzebra and his create-elm-app tool &lt;a href=&quot;https://www.npmjs.com/package/create-elm-app&quot; class=&quot;bare&quot;&gt;https://www.npmjs.com/package/create-elm-app&lt;/a&gt; which I used to bootstrap my work.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The &lt;a href=&quot;https://elmlang.herokuapp.com/&quot;&gt;Elm Slack channel&lt;/a&gt; for the very positive feedback and help.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;_et-voila&quot;&gt;Et voila.&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Have a play at &lt;a href=&quot;http://www.soundcode.co.za/elm-beats-demo/&quot; class=&quot;bare&quot;&gt;http://www.soundcode.co.za/elm-beats-demo/&lt;/a&gt; and let me know what you think.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Happy jamming !!!!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Thu, 03 Aug 2017 00:00:00 +0200</pubDate>
+        <link>http://localhost:4000/elm/javascript/audio/2017/08/03/elm-beats.html</link>
+        <guid isPermaLink="true">http://localhost:4000/elm/javascript/audio/2017/08/03/elm-beats.html</guid>
+        
+        
+        <category>Elm</category>
+        
+        <category>JavaScript</category>
+        
+        <category>Audio</category>
+        
+      </item>
     
       <item>
         <title>Simple visuals with the Web Audio API</title>
@@ -1457,135 +1683,6 @@ Have a look at &lt;a href=&quot;https://github.com/kafecho/ansible-couchdb2&quot
         <category>Scala</category>
         
         <category>Akka</category>
-        
-      </item>
-    
-      <item>
-        <title>Ansible: the installer pattern</title>
-        <description>&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;In this post, I will talk about an approach for doing configuration management in environments where the network is locked down and your target nodes don&amp;#8217;t have access to the Internet.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;_a-bit-of-context&quot;&gt;A bit of context&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;In my day job, I write software systems that help media companies (think BBC, ESPN) put together content (think news) that will be broacast to air.
-Over the years, software has morphed to become ever more sophisticated with ever more moving parts.
-We are no longer configuring a single executable that run on a Windows PC, we are producing systems that have to be correctly installed, configured and monitored.
-I&amp;#8217;ve been investing a lot of effort with Automate-all-the-things Ansible and today, we have a rather extensive set of roles for deploying pretty much all we need, from JVMs all the way to HA clusters and monitoring tools.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;A newsroom environment (as made popular by Aaron Sorkin&amp;#8217;s The Newsroom TV series) is a fairly controlled space. During a visit to the BBC production facility back in May this year, I had to put my laptop&amp;#8217;s power supply through a set of tests (in case it caused interferences with the broadcast signals). Likewise, there were no microwave ovens in sight in the lunch area (again, because they could issues and fry live radio transmissions). To add to the fun, in this production environment, machines tend to be locked down; they are often configured to block access to the outside world (the Internet). So your vanilla Ansible roles which download stuff from the internet won&amp;#8217;t fly.&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;_the-solution&quot;&gt;The solution&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;The solution we&amp;#8217;ve settled for is what I call the Ansible installer pattern. In this instance, the installer is a Linux node (I use CentOS) which contains pre-cached dependencies. The installer lives within the customer&amp;#8217;s Intranet. It runs Ansible with an Apache web server. At deployment time, the installer uses roles which instructs the target nodes to go and fetch rpms and other files from its web server (the so-called phone home pattern).&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;I&amp;#8217;ve experimented with various approaches to build the installer (all with Ansible):&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;as a complete OS image (built with Vagrant / VirtualBox)&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;as a docker container&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;as a self contained tar file that can be unpacked and used on any vanilla CentOS machine.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;We eventually settled for the last option. In the remainder of this post, I will describe how it works.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;To build the installer tar file, we launch a vanilla CentOS virtual machine (think of it as a golden installer) which we configure with Ansible. Ansible creates the cache folder and then runs a bunch of roles to cache various dependencies. In addition, Ansible fetches the packages to install Apache and the packages to install itself (so the system can be bootstraped). At the end; we are left with a folder,a bunch of scripts and some Ansible playbooks used for deployment. The folder is then archived and zipped using tar. The tar archive can be copied to any plain CentOS node that can then be used as an installer. Building the tar file is fully automated using Jenkins and Ansible.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;To make things more concrete, let&amp;#8217;s say you want to deploy the HAProxy load balancer, with this approach, you essentially have to write 2 roles.
-The purpose of the 1st role is to cache all the dependencies that are required to install HAProxy. This role is executed when the installer tar file is built. It looks like this:&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;yaml&quot;&gt;&lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;---&lt;/span&gt;
-- name: cache the rpms required to install HAProxy
-  shell: repotrack -p {{ rpms_root }} haproxy&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;The variable rpms_root point to a fixed location (i.e. the cache).&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;At deployment time, we use a different role that installs HAProxy from the rpms that have been cached.
-The role looks just like what you would write if the node had access to the Internet, except if uses a special purpose yum repository (here called ansible).&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;yaml&quot;&gt;&lt;span style=&quot;color: #0000FF; font-weight: bold&quot;&gt;---&lt;/span&gt;
-- name: install HAProxy
-  shell: yum install -y haproxy --disablerepo=* --enablerepo=ansible
-
-- name: customize HAProxy to serve HTTP traffic to the designated downstream servers
-  template: src=haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg owner=haproxy group=haproxy
-  notify: restart_haproxy
-
-- name: ensure HAProxy is started and enabled at boot time
-  service: name=haproxy state=started enabled=yes&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;At deployment time, the installer adds the special ansible yum repository on all the target nodes. The yum repo is derived from a template that looks like this:&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;pygments highlight&quot;&gt;&lt;code data-lang=&quot;ini&quot;&gt;&lt;span style=&quot;color: #008000; font-weight: bold&quot;&gt;[ansible]&lt;/span&gt;
-&lt;span style=&quot;color: #7D9029&quot;&gt;name&lt;/span&gt;&lt;span style=&quot;color: #666666&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;Ansible&lt;/span&gt;
-&lt;span style=&quot;color: #7D9029&quot;&gt;baseurl&lt;/span&gt;&lt;span style=&quot;color: #666666&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;http://{{ deployment_node_ip }}/rpms&lt;/span&gt;
-&lt;span style=&quot;color: #7D9029&quot;&gt;enabled&lt;/span&gt;&lt;span style=&quot;color: #666666&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;1&lt;/span&gt;
-&lt;span style=&quot;color: #7D9029&quot;&gt;gpgcheck&lt;/span&gt;&lt;span style=&quot;color: #666666&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color: #BA2121&quot;&gt;0&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;In other words, at deployment time, each node knows where to go to find the RPM to install. deployment_node_ip points to the IP address of the installer node.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;I&amp;#8217;ve tested this approach with CentOS nodes, but it should work (with some changes obviously, pick your favourite package manager) on other Linux distributions. I&amp;#8217;ve also tested caching and deploying Windows applications. It works quite well, but extra steps are required to download all the dependencies required to setup WinRM connections.&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;_pros-and-cons&quot;&gt;Pros and cons&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;An obvious benefit of the installer pattern is that it makes deployments quite a bit faster since everything is pre-cached. If you have to install a large package on a set of nodes (for example, a SolrCloud cluster) then the speedups can be quite substantial. If you have to deploy a full stack (from app to monitoring on multiple nodes), then even more so. From start to finish, our complex stack takes about 7 minutes to deploy and configure. The obvious downside of the approach is that it forces you to split your deployment into 2 stages (cache and install). Testing also requires a bit more rigour as you really need to ensure that your target machines are cut of from the Internet (otherwise you might be testing the wrong thing). For that I use Vagrant to launch clusters using private networks configured with no Internet access.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Most people nowadays are lucky enough to host things in the Cloud or on their own infrastructure. If you are not, and if tightly controlled environments are an issue for you, I am hoping that you&amp;#8217;ve found this post useful.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;As always, comments and questions are welcome.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Guillaume.&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;</description>
-        <pubDate>Fri, 27 Nov 2015 00:00:00 +0200</pubDate>
-        <link>http://localhost:4000/ansible/haproxy/devops/2015/11/27/ansible-the-installer-pattern.html</link>
-        <guid isPermaLink="true">http://localhost:4000/ansible/haproxy/devops/2015/11/27/ansible-the-installer-pattern.html</guid>
-        
-        
-        <category>Ansible</category>
-        
-        <category>HAProxy</category>
-        
-        <category>DevOps</category>
         
       </item>
     

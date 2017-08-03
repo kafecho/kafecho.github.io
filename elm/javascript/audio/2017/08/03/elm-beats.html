@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+    <title>Sound / Code - Guillaume's musings</title>
+    <meta name="description" content="" />
+
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="MobileOptimized" content="320" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <!-- Customisation  -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/main.css" />
+
+</head>
+<body class="home-template">
+
+    <header class="main-header post-head no-cover">
+    <nav class="main-nav  clearfix">
+        <a class="back-button icon-arrow-left" href="/">Home</a>
+        <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+    </nav>
+</header>
+
+<main class="content" role="main">
+
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">A simple drum machine with Elm and the Web Audio API</h1>
+            <section class="post-meta">
+                <time class="post-date" datetime="2017-08-03">03 Aug 2017</time>
+                
+                    on Elm, JavaScript, and Audio
+                
+            </section>
+        </header>
+
+<!--         <header class="post-header">
+            <a id="blog-logo" href="http://localhost:4000">
+                
+                    <span class="blog-title">Sound / Code</span>
+                
+            </a>
+        </header> -->
+
+        <!-- <span class="post-meta">
+            <time datetime="2017-08-03">03 Aug 2017</time>
+            
+                on Elm, JavaScript, and Audio
+            
+        </span> -->
+
+        <!-- <h1 class="post-title">A simple drum machine with Elm and the Web Audio API</h1> -->
+
+        <section class="post-content">
+            <div class="paragraph">
+<p>In this post, I am going to talk about how I built <a href="http://www.soundcode.co.za/elm-beats-demo/">Elm Beats</a>, a simple drum machine written in Elm with the Web Audio API.</p>
+</div>
+<div class="sect1">
+<h2 id="_context">Context</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A while ago, I came across this very interesting Web Application from Ableton (see <a href="https://learningmusic.ableton.com/" class="bare">https://learningmusic.ableton.com/</a>).
+The app uses the Web Audio API to explain what sounds is, and the various approaches you can use to create music.
+What is even cooler is that the front-end for this web app uses a lot of <a href="https://www.reddit.com/r/elm/comments/69z2aa/learning_music_from_ableton_frontend_built_with/">Elm code</a>.</p>
+</div>
+<div class="paragraph">
+<p>However, if you poke into the page source code (as I did), you will see that it mostly uses a bunch of JS libraries for the audio sequencing and event handling.</p>
+</div>
+<div class="paragraph">
+<p>While there is nothing wrong with that, as an experiment, I wanted to see how far I could get writing a simple audio app where I use:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Elm as much as possible</p>
+</li>
+<li>
+<p>JavaScript as little as possible</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>I eventually settled on building a drum machine, very similar in look and feel to the <a href="https://www.reddit.com/r/elm/comments/69z2aa/learning_music_from_ableton_frontend_built_with/">Ableton&#8217;s version</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the-code">The Code</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The code for the app in on Github: <a href="https://github.com/kafecho/elm-beats" class="bare">https://github.com/kafecho/elm-beats</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_approach">Approach</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In order to build the drum machine, I need to be able to play drum samples with as much precision as possible. This can be done with the Web Audio API which provides all the necessary mechanism for:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>decoding samples files (in .mp3 or .wav format)</p>
+</li>
+<li>
+<p>scheduling playback at very precise time in the future</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>When the Elm app starts, it tells JavaScript (via a port) to decode a bunch of samples stored as .wav file. In JavaScript land, those samples end up as Audio Buffers which are ready for playback.</p>
+</div>
+<div class="paragraph">
+<p>The port code looks like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="Elm">port loadSample : ( SampleAlias, SampleUrl ) -&gt; Cmd msg</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where: <strong>SampleAlias</strong> is a String to identify the sample, e.g. Kick and <strong>SampleUrl</strong> is a String which identifies the URL of the sample on the server.</p>
+</div>
+<div class="paragraph">
+<p>The corresponding JavaScript code is not complicated</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="JavaScript">app.ports.loadSample.subscribe(<span style="color: #008000; font-weight: bold">function</span> ( array ){
+  <span style="color: #008000; font-weight: bold">var</span> key <span style="color: #666666">=</span> array[<span style="color: #666666">0</span>];
+  <span style="color: #008000; font-weight: bold">var</span> url <span style="color: #666666">=</span> array[<span style="color: #666666">1</span>];
+
+  <span style="color: #008000; font-weight: bold">if</span> (samples[key] <span style="color: #666666">==</span> <span style="color: #008000; font-weight: bold">null</span>){
+    <span style="color: #008000; font-weight: bold">var</span> request <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> XMLHttpRequest();
+    request.open(<span style="color: #BA2121">&#39;GET&#39;</span>, url, <span style="color: #008000; font-weight: bold">true</span>);
+    request.responseType <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;arraybuffer&#39;</span>;
+    request.onload <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">function</span> () {
+        <span style="color: #008000; font-weight: bold">if</span> (request.status <span style="color: #666666">===</span> <span style="color: #666666">200</span>) {
+            <span style="color: #008000; font-weight: bold">var</span> audioData <span style="color: #666666">=</span> request.response;
+            audioContext.decodeAudioData(audioData,
+                <span style="color: #008000; font-weight: bold">function</span> (audioBuffer){
+                    samples[key]<span style="color: #666666">=</span>audioBuffer;
+                    console.log(<span style="color: #BA2121">&quot;Loaded&quot;</span>, key, url);
+                },
+                <span style="color: #008000; font-weight: bold">function</span> (e){
+                    notifySampleLoadingFailed(url);
+                });
+        }<span style="color: #008000; font-weight: bold">else</span> {
+            notifySampleLoadingFailed(url);
+        }
+    }
+
+    request.onerror <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">function</span> () {
+        notifySampleLoadingFailed(url);
+    }
+
+    request.send();
+  }
+});</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In a nutshell, the Elm code runs an infinite loop where it does the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>It finds out (via a port subscription) what is the current value of the audio clock. This is happening many times per second (tied to the requestAnimationFrame cycle)</p>
+</li>
+<li>
+<p>Once I know what the clock is at, I can work out if I have to schedule the playback of 1 or more samples in the near future</p>
+</li>
+<li>
+<p>I then use an outgoing port to schedule the sample playback at a very precise point in time.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The JavaScript ports are very simple (see <a href="https://github.com/kafecho/elm-beats/blob/master/src/index.js" class="bare">https://github.com/kafecho/elm-beats/blob/master/src/index.js</a>) and there is very little code. Most of the heavy lifting (sequencing, display, events) is 100% done in Elm.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_other-features">Other features</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The app allows you to:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Play / pause at anytime</p>
+</li>
+<li>
+<p>Clear the entire performance</p>
+</li>
+<li>
+<p>Mute / un-mute a given track</p>
+</li>
+<li>
+<p>Clear a given track</p>
+</li>
+<li>
+<p>Share your creation via URL (with a hashtag which contains an encoding of the performance)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_observations">Observations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Even though the JavaScript codebase is tiny, it is the <strong>only place</strong> where I got JavaScript runtime errors :-)</p>
+</div>
+<div class="paragraph">
+<p>While refactoring the code, I got plenty of compile-time errors in Elm, but the compiler was quite efficient at guiding my choices. Once the Elm code compiles, it is likely that is going to work.</p>
+</div>
+<div class="paragraph">
+<p>Elm&#8217;s virtual DOM functions were really useful for creating the UI. The UI is basically a grid (an HTML table) where each cell controls a given semiquaver of a given instrument (the user can press on the cell to toggle the playback for that given note).</p>
+</div>
+<div class="paragraph">
+<p>So I have a function <code>createCell</code> which creates an HTML <strong>td</strong> element for a given note. That <strong>td</strong> component does the necessary event handling and is styled accordingly.</p>
+</div>
+<div class="paragraph">
+<p>I can <code>map</code> this function over a list of notes to give me the row for a given instrument.</p>
+</div>
+<div class="paragraph">
+<p>Via another <code>map</code> I repeat the same loop for all the instruments until I end up with a grid. Super simple function application.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_many-thanks">Many thanks</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Many thanks to</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>To Ableton for putting together the impressive work at <a href="https://learningmusic.ableton.com" class="bare">https://learningmusic.ableton.com</a></p>
+</li>
+<li>
+<p>To @halfzebra and his create-elm-app tool <a href="https://www.npmjs.com/package/create-elm-app" class="bare">https://www.npmjs.com/package/create-elm-app</a> which I used to bootstrap my work.</p>
+</li>
+<li>
+<p>The <a href="https://elmlang.herokuapp.com/">Elm Slack channel</a> for the very positive feedback and help.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_et-voila">Et voila.</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Have a play at <a href="http://www.soundcode.co.za/elm-beats-demo/" class="bare">http://www.soundcode.co.za/elm-beats-demo/</a> and let me know what you think.</p>
+</div>
+<div class="paragraph">
+<p>Happy jamming !!!!</p>
+</div>
+</div>
+</div>
+        </section>
+
+        
+
+        <footer class="post-footer">
+            <!-- If we want to display author's name and bio -->
+            
+                <figure class="author-image">
+                    <a class="img" href="/" style="background-image: url(/assets/images/profile.jpg)">
+                    <span class="hidden">Guillaume Belrose's Picture</span></a>
+                </figure>
+                <section class="author">
+                    <!-- Author Name -->
+                    <h4> Guillaume Belrose </h4>
+                    <!-- Author Bio -->
+                    <p>
+                        Call me "G" and follow me on Twitter <a href="http://www.twitter.com/gbelrose">@gbelrose</a>
+                    </p>
+                </section>
+            
+
+            <!-- Share links section -->
+            <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?text=A simple drum machine with Elm and the Web Audio API&amp;url=http://www.soundcode.co.za/elm/javascript/audio/2017/08/03/elm-beats.html"
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://www.soundcode.co.za/elm/javascript/audio/2017/08/03/elm-beats.html"
+        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://www.soundcode.co.za/elm/javascript/audio/2017/08/03/elm-beats.html"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+            
+  <div id="disqus_thread"></div>
+  <script>
+  /**
+  * RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+  * LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+  */
+  var disqus_config = function () {
+    this.page.url = "http://www.soundcode.co.za/elm/javascript/audio/2017/08/03/elm-beats.html"; // Replace PAGE_URL with your page's canonical URL variable
+  this.page.identifier = "www.soundcode.co.za/elm/javascript/audio/2017/08/03/elm-beats.html"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+  };
+  (function() { // DON'T EDIT BELOW THIS LINE
+  var d = document, s = d.createElement('script');
+
+  s.src = '//www-soundcode-co-za.disqus.com/embed.js';
+
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+  })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+        </footer>
+
+    </article>
+
+</main>
+
+    <footer class="site-footer clearfix">
+      <section class="copyright">
+        <a href="/">Sound / Code</a> &copy; 2017 &bull; All rights reserved.
+      </section>
+      <section class="poweredby">Made with Jekyll using <a href="http://github.com/rosario/kasper">Kasper theme</a>
+      </section>
+    </footer>
+
+    <script type="text/javascript" src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+
+    <!-- Google Analytics Tracking code -->
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-XXXXXXXX-X']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+</body>
+</html>
